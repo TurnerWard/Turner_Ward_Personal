@@ -39,7 +39,7 @@ static long pMultiply(long x, long y) {
 // ----------------------------------------------
 // Matrix operation
 // ----------------------------------------------
-void Matrix3::multiply(const Matrix3 &mat1, const Matrix3 &mat2, Matrix3& mat ) {
+void Matrix3::multiply(const Matrix3 &mat1, const Matrix3 &mat2, Matrix3 &mat ) {
   unsigned char r,c;
   for (c=0; c<3; c++)
     for (r=0; r<3; r++)

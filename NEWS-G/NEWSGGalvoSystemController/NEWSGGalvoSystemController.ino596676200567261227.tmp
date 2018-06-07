@@ -25,11 +25,10 @@ void setup() {
 // -> void VandeGraaffSimulation(int count, int xOffset, int yOffset); // Simualtes a Van de Graaff simulation.
 // -> laser.wait(long length); // Has the laser wait in microseconds.
 void loop() {
-  //circle();
-  drawLine(0,0,4096,0);
+  letterJumbleToWord("PGK0D!","NEWS-G", 2048, 2048);
 }
 
-// letterJumbleToWord("ZGK0/!","NEWS-G", 2048, 2048);
+
 
 
 
@@ -43,9 +42,6 @@ void loop() {
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 void drawLine(int xStart, int yStart, int xEnd, int yEnd) {
-  laser.setEnable3D(true);
-  laser.setScale(1);
-  laser.setOffset(-2048, -2048); 
   laser.drawline(xStart, yStart, xEnd, yEnd); // Draws a line from a given start to end location.
 }
 
