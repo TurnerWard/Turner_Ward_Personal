@@ -18,15 +18,16 @@ void setup() {
 // -> void drawLine(int xStart, int yStart, int xEnd, int yEnd); // Draws a line from point one to point two.
 // -> void letterJumbleToWord(String startWord, String endWord, int xOffset, int yOffset); // Starts from a given word and quickly scrambels them until it arrives at the second word.
 // -> void increasingFontSize(String str, int xOffset, int yOffset); // Increases the font size from 0 to the standard font size. This needs to occur around (2048,2048) for full effect.
-// -> void rotateStringX(String str, int xOffset, int yOffset) // Rotates the string about the x-axis.
-// -> void rotateStringY(String str, int xOffset, int yOffset) // Rotates the string about the y-axis.
+// -> void rotateStringX(String str, int xOffset, int yOffset); // Rotates the string about the x-axis.
+// -> void rotateStringY(String str, int xOffset, int yOffset); // Rotates the string about the y-axis.
 // -> void countDown(); // Creates a circle that counts dont from 9 to 1.
 // -> void circle(); // Creates a circle.
 // -> void VandeGraaffSimulation(int count, int xOffset, int yOffset); // Simualtes a Van de Graaff simulation.
-// -> laser.wait(long length); // Has the laser wait in microseconds.
+// -> void drawWord(String str, int xOffset, int yOffset); // Displays a word at the given location.
+
 void loop() {
-  //circle();
-  drawLine(0,0,4096,0);
+
+  
 }
 
 // letterJumbleToWord("ZGK0/!","NEWS-G", 2048, 2048);
@@ -41,6 +42,13 @@ void loop() {
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////// HELPER FUNCTIONS ////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////
+
+void drawWord(String str, int xOffset, int yOffset) {
+  int w = Drawing::stringAdvance(str);
+  laser.setScale(0.5);
+  laser.setOffset(xOffset, yOffset);
+  Drawing::drawString(str,-w/2, -500);
+}
 
 void drawLine(int xStart, int yStart, int xEnd, int yEnd) {
   laser.setEnable3D(true);
@@ -74,7 +82,6 @@ void letterJumbleToWord(String startWord, String endWord, int xOffset, int yOffs
    }
    laser.resetClipArea();
 }
-
 
 void increasingFontSize(String str, int xOffset, int yOffset) {
   int w = Drawing::stringAdvance(str);
