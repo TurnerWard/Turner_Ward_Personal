@@ -24,9 +24,11 @@ void setup() {
 // -> void circle(); // Creates a circle.
 // -> void VandeGraaffSimulation(int count, int xOffset, int yOffset); // Simualtes a Van de Graaff simulation.
 // -> void drawWord(String str, int xOffset, int yOffset); // Displays a word at the given location.
+// -> void drawStar(int sizeMultiplier, int xMiddlePoint, int yMiddlePoint); // Creates a star at the provided location. Multiplier of 40 is approximalty the max at the center.
 
 void loop() {
 
+  drawStar(40, 2048, 2048);
   
 }
 
@@ -42,6 +44,19 @@ void loop() {
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////// HELPER FUNCTIONS ////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////
+
+void drawStar(int sizeMultiplier, int xMiddlePoint, int yMiddlePoint) {
+  drawLine(xMiddlePoint, yMiddlePoint+50*sizeMultiplier, xMiddlePoint+10*sizeMultiplier, yMiddlePoint+20*sizeMultiplier);
+  drawLine(xMiddlePoint+10*sizeMultiplier, yMiddlePoint+20*sizeMultiplier, xMiddlePoint+40*sizeMultiplier, yMiddlePoint+20*sizeMultiplier);
+  drawLine(xMiddlePoint+40*sizeMultiplier, yMiddlePoint+20*sizeMultiplier, xMiddlePoint+20*sizeMultiplier, yMiddlePoint);
+  drawLine(xMiddlePoint+20*sizeMultiplier, yMiddlePoint, xMiddlePoint+30*sizeMultiplier, yMiddlePoint-30*sizeMultiplier);
+  drawLine(xMiddlePoint+30*sizeMultiplier, yMiddlePoint-30*sizeMultiplier, xMiddlePoint, yMiddlePoint-10*sizeMultiplier);    
+  drawLine(xMiddlePoint, yMiddlePoint-10*sizeMultiplier, xMiddlePoint-30*sizeMultiplier, yMiddlePoint-30*sizeMultiplier);
+  drawLine(xMiddlePoint-30*sizeMultiplier, yMiddlePoint-30*sizeMultiplier, xMiddlePoint-20*sizeMultiplier, yMiddlePoint);
+  drawLine(xMiddlePoint-20*sizeMultiplier, yMiddlePoint, xMiddlePoint-40*sizeMultiplier, yMiddlePoint+20*sizeMultiplier);
+  drawLine(xMiddlePoint-40*sizeMultiplier, yMiddlePoint+20*sizeMultiplier, xMiddlePoint-10*sizeMultiplier, yMiddlePoint+20*sizeMultiplier);
+  drawLine(xMiddlePoint-10*sizeMultiplier, yMiddlePoint+20*sizeMultiplier, xMiddlePoint, yMiddlePoint+50*sizeMultiplier);
+}
 
 void drawWord(String str, int xOffset, int yOffset) {
   int w = Drawing::stringAdvance(str);

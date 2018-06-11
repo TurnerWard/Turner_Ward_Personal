@@ -25,3 +25,17 @@ Arduino code to control a DAC that controls the galvo system motors.
 |circle() | Creates a circle. Is used primarily for the countDown() function; however, it can be changed to have input parameters to be its own stand alone functions. | None |
 |VandeGraaffSimulation() | Simulates a Van de Graaff generater using a circle and demonstrating lightening around the outer circle to middle. | (int count, int xOffset, int yOffset) |
 |drawWord() | Displays a word at the desired offset specified by the user. | (String str, int xOffset, int yOffset) |
+|drawStar() | Displays a star at the specified location with the desired integer multiplier. The maximum size at a location of (2048, 2048) is 40. | (int sizeMultiplier, int xMiddlePoint, int yMiddlePoint) |
+
+
+
+
+
+
+
+
+
+
+
+
+
