@@ -28,22 +28,32 @@ void setup() {
 
 void loop() {
 
-  drawStar(40, 2048, 2048);
+  //drawLine(0,4096,900,0);
+  //drawLine(0,0,4096,4096);
+  circle();
+  simulateTrack(10,2048,2048);
   
 }
 
 // letterJumbleToWord("ZGK0/!","NEWS-G", 2048, 2048);
 
 
-
-
-
-
-
-
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////// HELPER FUNCTIONS ////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////
+
+void simulateTrack(int energy, int xMiddlePoint, int yMiddlePoint) {
+  const int scale = 2000;
+  laser.setScale(1);
+  laser.setOffset(xMiddlePoint,yMiddlePoint);
+  laser.sendto(SIN(0)*energy/scale, COS(0)*energy/scale);
+  laser.on();
+  for (int r = 5;r<=360;r+=5) { 
+    circle();
+    laser.sendto(SIN(r)*energy/scale, COS(r)*energy/scale);
+  }
+  laser.off();
+}
 
 void drawStar(int sizeMultiplier, int xMiddlePoint, int yMiddlePoint) {
   drawLine(xMiddlePoint, yMiddlePoint+50*sizeMultiplier, xMiddlePoint+10*sizeMultiplier, yMiddlePoint+20*sizeMultiplier);
@@ -66,10 +76,12 @@ void drawWord(String str, int xOffset, int yOffset) {
 }
 
 void drawLine(int xStart, int yStart, int xEnd, int yEnd) {
+  laser.on();
   laser.setEnable3D(true);
   laser.setScale(1);
   laser.setOffset(-2048, -2048); 
   laser.drawline(xStart, yStart, xEnd, yEnd); // Draws a line from a given start to end location.
+  laser.off();
 }
 
 void letterJumbleToWord(String startWord, String endWord, int xOffset, int yOffset) {  
