@@ -2,6 +2,7 @@
 // Copyright 2016 Florian Link (at) gmx.de
 #include "Drawing.h"
 #include "Font.h"
+#include "ParticleDecay.h"
 
 
 void Drawing::drawString(String text, int x, int y, int count)
@@ -38,6 +39,16 @@ long Drawing::advance(byte letter)
   } else
   if (letter == 'W') {
     adv = 1000;
+  }
+  return adv;
+}
+
+long Drawing::drawParticlePath(byte pathNumber, long translateX, long translateY){
+  long adv = advance(pathNumber);
+
+  switch (pathNumber) {
+    case '1': drawObject(display_Path1, sizeof(display_Path1)/4, translateX, translateY); break;
+    break;
   }
   return adv;
 }

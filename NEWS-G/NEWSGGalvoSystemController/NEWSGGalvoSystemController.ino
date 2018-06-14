@@ -4,9 +4,13 @@
 #include "Objects.h"
 
 Laser laser(5); // Creates a laser instance with the laser pointer connected to pin 5.
+unsigned long currentMillis; // Can run for ~50 days.
+unsigned long nextEvent; // Can run for ~50 days.
 
 void setup() {
+  Serial.begin(9600);
   laser.init(); // Initiates the laser which also initiates the dac.
+  initiateLaserForDetectorDisplay(); // Initates the laser settings for the detector.
 }
 
 //////////////////////////////////////////////
@@ -28,32 +32,151 @@ void setup() {
 
 void loop() {
 
-  //drawLine(0,4096,900,0);
-  //drawLine(0,0,4096,4096);
-  circle();
-  simulateTrack(10,2048,2048);
+  //VandeGraaffSimulation(100, 2048, 2048);
+
+  displayDetector();
   
+  currentMillis = millis();
+  if(nextEvent < currentMillis) {
+    //electronLineTrack();   
+    electronDiskTrack();
+    nextEvent = millis() + random(500, 3000);
+  }
 }
 
 // letterJumbleToWord("ZGK0/!","NEWS-G", 2048, 2048);
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////// HELPER FUNCTIONS ////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
+void electronLineTrack() {
+  laser.off(); // Makes sure the laser is off.
+  randomSeed(0); // Randomizes the seed.
+  
+  int rStart = random(1028, 2048); // Randomly returns the radius value for the electron to start at between 1028 and 2048.
+  int thetaStart = random(0, 360); // Randomly returns the theta value for the electron to start at.
+
+  laser.sendto(rStart*COS(thetaStart)/16384, rStart*SIN(thetaStart)/16384); // Converts from polar to cartesian and moves the laser to the start position.
+  laser.on(); // Turns the laser on.
+
+  int rCurrent = rStart;
+  int thetaCurrent = thetaStart;
+  while(rCurrent > 100) { // While outside the inner radius where the electric field is weaker.                
+    int rMovement = random(100,500); // Generates a random value between 100 and 500 for the r distance that the electron will move in this step. 
+    int thetaMovement = random(-35,35); // Generates a random value between -35 and 35 for the theta direction that the electron will move in this step.
+    rCurrent = rCurrent - rMovement; // Updates the current r value.
+    thetaCurrent = thetaCurrent + thetaMovement; // Updates the current theta value.
+    laser.sendto(rCurrent*COS(thetaCurrent)/16384, rCurrent*SIN(thetaCurrent)/16384); // Converts from polar to cartesian and moves the laser to the newly updates position.
+  }
+
+  laser.sendto(0, 0); // If the electron is within 100 pixels of the center of the detector the electric field value is so strong it will be pulled directily towards the center.
+  laser.off(); // Turns off the laser as the pathing is now complete.
+}
+
+void electronDiskTrack() {
+  laser.off(); // Makes sure the laser is off.
+  randomSeed(0); // Randomizes the seed.
+  
+  int rStart = random(1028, 2048); // Randomly returns the radius value for the electron to start at between 1028 and 2048.
+  int thetaStart = random(0, 360); // Randomly returns the theta value for the electron to start at.
+
+  simulateTrack(100, rStart*COS(thetaStart)/16384, rStart*SIN(thetaStart)/16384); // Converts from polar to cartesian and creates the electron at the start position.
+  laser.on(); // Turns the laser on.
+
+  int rCurrent = rStart;
+  int thetaCurrent = thetaStart;
+  while(rCurrent > 100) { // While outside the inner radius where the electric field is weaker.                         
+    displayDetector();
+    int rMovement = random(10,50); // Generates a random value between 100 and 500 for the r distance that the electron will move in this step. 
+    int thetaMovement = random(-5,5); // Generates a random value between -35 and 35 for the theta direction that the electron will move in this step.
+    rCurrent = rCurrent - rMovement; // Updates the current r value.
+    thetaCurrent = thetaCurrent + thetaMovement; // Updates the current theta value.
+    simulateTrack(100, rCurrent*COS(thetaCurrent)/16384, rCurrent*SIN(thetaCurrent)/16384); // Converts from polar to cartesian and creates the electron at the start position.
+  }
+
+  while (rCurrent <= 100 && 0 < rCurrent) {
+    displayDetector();
+    rCurrent = rCurrent - 20;
+    simulateTrack(100, rCurrent*COS(thetaCurrent)/16384, rCurrent*SIN(thetaCurrent)/16384); // If the electron is within 100 pixels of the center of the detector the electric field value is so strong it will be pulled directily towards the center.
+  }
+  laser.off(); // Turns off the laser as the pathing is now complete.
+}
+
+void alphaTrack(int energy, int xStartLocation, int yStartLocation, int xEndLocation, int yEndLocation) {
+  
+}
+
+void displayDetector() {
+  laser.off();
+  const int scale = 8; // The value needed to convert from the larger scale of max value being 16384 to the smaller more appropriate scale of 2048.
+  laser.sendto(SIN(0)/scale, COS(0)/scale); // Moves the laser to the correct starting location.
+  laser.on(); // Now since we are in the correct location we can turn the laser on.
+  
+  for (int r = 0;r<=360;r+=12) // Rotates through the angles of the circle with the provided step size.
+  {    
+    laser.sendto(SIN(r)/scale, COS(r)/scale); // Displays the circle.
+  }
+  laser.off(); // After we have displayed the laser we can turn off the laser.
+
+  laser.sendto(0, -2048); laser.on(); laser.sendto(0,0); laser.off(); // Displays the rod.
+}
+
 void simulateTrack(int energy, int xMiddlePoint, int yMiddlePoint) {
-  const int scale = 2000;
-  laser.setScale(1);
-  laser.setOffset(xMiddlePoint,yMiddlePoint);
-  laser.sendto(SIN(0)*energy/scale, COS(0)*energy/scale);
+  laser.sendto(SIN(0)*energy/16384 + xMiddlePoint, COS(0)*energy/16384 + yMiddlePoint);
   laser.on();
-  for (int r = 5;r<=360;r+=5) { 
-    circle();
-    laser.sendto(SIN(r)*energy/scale, COS(r)*energy/scale);
+  for (int r = 0;r<=360;r+=30) { 
+    laser.sendto(SIN(r)*energy/16384 + xMiddlePoint, COS(r)*energy/16384 + yMiddlePoint);
   }
   laser.off();
 }
+
+void initiateLaserForDetectorDisplay() {
+  laser.setScale(1); // Sets the scaling to be normal (no multiplication factor applied to the image).
+  laser.setOffset(2048,2048); // Sets the offset for the laser so the circles center corresponds to (0,0).
+}
+
+void NEWSGDEMO() {
+  delay(3000);
+  currentMillis = millis();
+  while(currentMillis < 5000) {
+    drawWord("NEWS-G", 1500, 1500);
+    currentMillis = millis();
+  }
+  rotateStringX("NEWS-G", 1500, 1500);
+  int endedTime = millis();
+  currentMillis = millis();
+  while(currentMillis < 5000 + endedTime) {
+    drawWord("NEWS-G", 1500, 1500);
+    currentMillis = millis();
+  }
+  rotateStringY("NEWS-G", 1500, 1500);
+  delay(3000);
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////// FUNTIONS DESIGNED FOR TEXT PROJECTION ////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void drawStar(int sizeMultiplier, int xMiddlePoint, int yMiddlePoint) {
   drawLine(xMiddlePoint, yMiddlePoint+50*sizeMultiplier, xMiddlePoint+10*sizeMultiplier, yMiddlePoint+20*sizeMultiplier);
@@ -72,7 +195,9 @@ void drawWord(String str, int xOffset, int yOffset) {
   int w = Drawing::stringAdvance(str);
   laser.setScale(0.5);
   laser.setOffset(xOffset, yOffset);
-  Drawing::drawString(str,-w/2, -500);
+  laser.setEnable3D(true);
+  Drawing::drawString(str,-w/2, -500,1);
+  laser.setEnable3D(false);
 }
 
 void drawLine(int xStart, int yStart, int xEnd, int yEnd) {
@@ -127,7 +252,7 @@ void rotateStringX(String str, int xOffset, int yOffset) {
   laser.setScale(0.5);
   laser.setOffset(xOffset,yOffset);
   int count = 360/4;
-  int angle = 45;
+  int angle = 0;
   for (int i = 0;i<count;i++) {
     Matrix3 world;
     world = Matrix3::rotateX(angle % 360);
@@ -144,7 +269,7 @@ void rotateStringY(String str, int xOffset, int yOffset) {
   laser.setScale(0.5);
   laser.setOffset(xOffset,yOffset);
   int count = 360/4;
-  int angle = 45;
+  int angle = 0;
   for (int i = 0;i<count;i++) {
     Matrix3 world;
     world = Matrix3::rotateY(angle % 360);

@@ -14,6 +14,9 @@ public:
   //! Draws the given string at x,y position. Count indicates how often the drawing is repeated.
   static void drawString(String text, int x, int y, int repeat = 1);
 
+  //! Draws the provided particle path.
+  static long drawParticlePath(byte pathNumber, long translateX, long translateY);
+
   //! Draws the given letter (A-Z, 0-9, !? are currently supported in the font), returns the x advance...
   static long drawLetter(byte letter, long translateX = 0, long translateY = 0);
 
