@@ -1,20 +1,22 @@
 #include "Laser.h"
 
-Laser laser(5);
+Laser redlaser(5); // Initiates a red laser in the 5th arduino pin.
+//Laser greenlaser(3); // Initiates a green laser in the 3rd arduino pin.
 
 unsigned long currentMillis; // Can run for ~50 days.
 unsigned long nextEvent; // Can run for ~50 days.
 
 void setup() {
-  laser.init(); // Initiates the laser which also initiates the dac.
+  
+  redlaser.init(); // Initiates the laser which also initiates the dac.
   initiateLaserForDetectorDisplay(); // Initates the laser settings for the detector.
 }
 
 void loop() {
 
-  displayDetector();
+  displayDetector(); // Displays the detector.
   
-  currentMillis = millis();
+  currentMillis = millis(); // A timer.
   if(nextEvent < currentMillis) {
     //electronLineTrack();   
     electronDiskTrack();
@@ -42,14 +44,14 @@ void electronLineTrack() {
   const int maxSINCOSvalue = 16384; // The maximum value that SIN and COS can return. This value is used for scaling purposes. It shouldnt be changed. If it is for
                                     // some reason the default value is 16384.
   
-  laser.off(); // Makes sure the laser is off.
+  redlaser.off(); // Makes sure the laser is off.
   randomSeed(0); // Randomizes the seed.
   
   int rCurrent = random(rStartLowerBounds,rStartUpperBounds); // Randomly returns the radius value for the electron to start at between 1028 and 2048.
   int thetaCurrent = random(0,360); // Randomly returns the theta value for the electron to start at.
 
-  laser.sendto(rCurrent*COS(thetaCurrent)/maxSINCOSvalue, rCurrent*SIN(thetaCurrent)/maxSINCOSvalue); // Converts from polar to cartesian and moves the laser to the start position.
-  laser.on(); // Turns the laser on.
+  redlaser.sendto(rCurrent*COS(thetaCurrent)/maxSINCOSvalue, rCurrent*SIN(thetaCurrent)/maxSINCOSvalue); // Converts from polar to cartesian and moves the laser to the start position.
+  redlaser.on(); // Turns the laser on.
 
   while(rCurrent > rStrongElectricField) { // While outside the inner radius where the electric field is weaker.                
     int rMovement = random(rMovementLowerBounds,rMovementUpperBounds); // Generates a random value between the range declared above for the r distance that the electron will 
@@ -57,11 +59,11 @@ void electronLineTrack() {
     int thetaMovement = random(-thetaMovementBounds,thetaMovementBounds); // Generates a random value between -5 and 5 for the theta direction that the electron will move in this step.
     rCurrent = rCurrent - rMovement; // Updates the current r value.
     thetaCurrent = thetaCurrent + thetaMovement; // Updates the current theta value.
-    laser.sendto(rCurrent*COS(thetaCurrent)/maxSINCOSvalue, rCurrent*SIN(thetaCurrent)/maxSINCOSvalue); // Converts from polar to cartesian and moves the laser to the newly updates 
+    redlaser.sendto(rCurrent*COS(thetaCurrent)/maxSINCOSvalue, rCurrent*SIN(thetaCurrent)/maxSINCOSvalue); // Converts from polar to cartesian and moves the laser to the newly updates 
                                                                                                         // position.
   }
-  laser.sendto(0, 0); // If the electron is within 100 pixels of the center of the detector the electric field value is so strong it will be pulled directily towards the center.
-  laser.off(); // Turns off the laser as the pathing is now complete.
+  redlaser.sendto(0, 0); // If the electron is within 100 pixels of the center of the detector the electric field value is so strong it will be pulled directily towards the center.
+  redlaser.off(); // Turns off the laser as the pathing is now complete.
 }
 
 /* void electronDiskTrack()
@@ -76,24 +78,24 @@ void electronDiskTrack() {
   int rMovementLowerBounds = 10; // The smallest step an electron can move after appearing. Default is 100.
   int rMovementUpperBounds = 50; // The largest step an electron can move after appearing. Default is 500.
   int thetaMovementBounds = 5; // The maximum angle in degrees for which the electron can move in one step. Default is 5.
-  int energyLowerBounds = 30; // The minimum energy for which an electron can be generated in keV. Default is 30.
-  int energyUpperBounds = 100; // The maximum energy for which an electron can be generated in keV. Default is 100.
+  int energyLowerBounds = 70; // The minimum energy for which an electron can be generated in keV. Default is 70.
+  int energyUpperBounds = 200; // The maximum energy for which an electron can be generated in keV. Default is 200.
   int energyChangeLowerBounds = 1; // The minimum energy that an electron can lose in 1 interaction in keV. Default is 1.
-  int energyChangeUpperBounds = 10; // The maximum energy that an electron can lose in 1 interaction in keV. Default is 10.
+  int energyChangeUpperBounds = 5; // The maximum energy that an electron can lose in 1 interaction in keV. Default is 5.
 
   const int maxSINCOSvalue = 16384; // The maximum value that SIN and COS can return. This value is used for scaling purposes. It shouldnt be changed. If it is for
                                     // some reason the default value is 16384.
                               
-  laser.off(); // Makes sure the laser is off.
+  redlaser.off(); // Makes sure the laser is off.
   randomSeed(0); // Randomizes the seed.
   
   int rCurrent = random(rStartLowerBounds, rStartUpperBounds); // Randomly returns the radius value for the electron to start at between 1028 and 2048.
   int thetaCurrent = random(0, 360); // Randomly returns the theta value for the electron to start at.
   int energyCurrent = random(energyLowerBounds,energyUpperBounds);
  
-  simulateTrack(energyCurrent, rStart*COS(thetaStart)/maxSINCOSvalue, rStart*SIN(thetaStart)/maxSINCOSvalue); // Converts from polar to cartesian and creates the electron at the start 
+  simulateTrack(energyCurrent, rCurrent*COS(thetaCurrent)/maxSINCOSvalue, rCurrent*SIN(thetaCurrent)/maxSINCOSvalue); // Converts from polar to cartesian and creates the electron at the start 
                                                                                                               // position.
-  laser.on(); // Turns the laser on.
+  redlaser.on(); // Turns the laser on.
 
   while(rCurrent > rStrongElectricField && energyCurrent > 0) { // While outside the inner radius where the electric field is weaker and the electron still has energy.
     displayDetector(); // Keeps the detector displayed as depending on the step size the detector can disappear when transversing within this function.
@@ -123,7 +125,7 @@ void electronDiskTrack() {
                                                                                                               // detector the electric field value is so strong it will be pulled 
                                                                                                               // directily towards the center.
   }
-  laser.off(); // Turns off the laser as the pathing is now complete.
+  redlaser.off(); // Turns off the laser as the pathing is now complete.
 }
 
 /* void displayDetector()
@@ -134,21 +136,21 @@ void electronDiskTrack() {
 void displayDetector() {
   int circleStepSize = 15; // Changes the step size as the for loop passes through the circle. Smaller values create more perfect circles. Default is 15.
   
-  laser.off(); // Makes sure the laser is off. This was needed to avoid fencing at this point.
+  redlaser.off(); // Makes sure the laser is off. This was needed to avoid fencing at this point.
   const int maxSINCOSvalue = 8; // The value needed to convert from the larger scale of max value being 16384 to the smaller more appropriate scale of 2048.
-  laser.sendto(SIN(0)/maxSINCOSvalue, COS(0)/maxSINCOSvalue); // Moves the laser to the correct starting location.
-  laser.on(); // Now since we are in the correct location we can turn the laser on.
+  redlaser.sendto(SIN(0)/maxSINCOSvalue, COS(0)/maxSINCOSvalue); // Moves the laser to the correct starting location.
+  redlaser.on(); // Now since we are in the correct location we can turn the laser on.
   
   for (int r = 0; r <= 360; r += circleStepSize) // Rotates through the angles of the circle with the provided step size.
   {    
-    laser.sendto(SIN(r)/maxSINCOSvalue, COS(r)/maxSINCOSvalue); // Displays the circle.
+    redlaser.sendto(SIN(r)/maxSINCOSvalue, COS(r)/maxSINCOSvalue); // Displays the circle.
   }
   
-  laser.off(); // After we have displayed the laser we can turn off the laser.
-  laser.sendto(0, -2048); // Moves to the bottom portion of the rod.
-  laser.on();  // Turns on the laser.
-  laser.sendto(0,0); // Moves to the center of the circle .
-  laser.off(); // Turns the laser off.
+  redlaser.off(); // After we have displayed the laser we can turn off the laser.
+  redlaser.sendto(0, -2048); // Moves to the bottom portion of the rod.
+  redlaser.on();  // Turns on the laser.
+  redlaser.sendto(0,0); // Moves to the center of the circle .
+  redlaser.off(); // Turns the laser off.
 }
 
 /* void simulateTrack(int energy, int xMiddlePoint, int yMiddlePoint)
@@ -157,12 +159,12 @@ void displayDetector() {
  * 
  */
 void simulateTrack(int energy, int xMiddlePoint, int yMiddlePoint) {
-  laser.sendto(SIN(0)*energy/16384 + xMiddlePoint, COS(0)*energy/16384 + yMiddlePoint);
-  laser.on();
+  redlaser.sendto(SIN(0)*energy/16384 + xMiddlePoint, COS(0)*energy/16384 + yMiddlePoint);
+  redlaser.on();
   for (int r = 0;r<=360;r+=45) { 
-    laser.sendto(SIN(r)*energy/16384 + xMiddlePoint, COS(r)*energy/16384 + yMiddlePoint);
+    redlaser.sendto(SIN(r)*energy/16384 + xMiddlePoint, COS(r)*energy/16384 + yMiddlePoint);
   }
-  laser.off();
+  redlaser.off();
 }
 
 /* initiateLaserForDetectorDisplay()
@@ -171,6 +173,9 @@ void simulateTrack(int energy, int xMiddlePoint, int yMiddlePoint) {
  * 
  */
 void initiateLaserForDetectorDisplay() {
-  laser.setScale(1); // Sets the scaling to be normal (no multiplication factor applied to the image).
-  laser.setOffset(2048,2048); // Sets the offset for the laser so the circles center corresponds to (0,0).
+  redlaser.setScale(1); // Sets the scaling to be normal (no multiplication factor applied to the image) for the red laser.
+  redlaser.setOffset(2048,2048); // Sets the offset for the laser so the circles center corresponds to (0,0) for the red laser.
+
+  //greenlaser.setScale(1); // Sets the scaling to be normal (no multiplication factor applied to the image) for the green laser.
+  //greenlaser.setOffset(2048,2048); // Sets the offset for the laser so the circles center corresponds to (0,0) for the green laser.
 }
