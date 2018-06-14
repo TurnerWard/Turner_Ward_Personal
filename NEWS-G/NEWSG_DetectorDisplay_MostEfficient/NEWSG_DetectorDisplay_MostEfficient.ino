@@ -26,7 +26,9 @@ void loop() {
 //////////////////////////////////////// HELPER FUNCTIONS ////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-/* void 
+/* void electronLineTrack()
+ * 
+ * Displays an electron track in the line style within the projected detector.
  * 
  */
 void electronLineTrack() {
@@ -37,8 +39,8 @@ void electronLineTrack() {
   int rMovementUpperBounds = 500; // The largest step an electron can move after appearing. Default is 500.
   int thetaMovementBounds = 5; // The maximum angle in degrees for which the electron can move in one step. Default is 5.
 
-  int maxSINCOSvalue = 16384; // The maximum value that SIN and COS can return. This value is used for scaling purposes. It shouldnt be changed. If it is for
-                              // some reason the default value is 16384.
+  const int maxSINCOSvalue = 16384; // The maximum value that SIN and COS can return. This value is used for scaling purposes. It shouldnt be changed. If it is for
+                                    // some reason the default value is 16384.
   
   laser.off(); // Makes sure the laser is off.
   randomSeed(0); // Randomizes the seed.
@@ -50,62 +52,110 @@ void electronLineTrack() {
   laser.on(); // Turns the laser on.
 
   while(rCurrent > rStrongElectricField) { // While outside the inner radius where the electric field is weaker.                
-    int rMovement = random(rMovementLowerBounds,rMovementUpperBounds); // Generates a random value between 100 and 500 for the r distance that the electron will move in this step. 
-    int thetaMovement = random(-thetaMovementBounds,thetaMovementBounds); // Generates a random value between -35 and 35 for the theta direction that the electron will move in this step.
+    int rMovement = random(rMovementLowerBounds,rMovementUpperBounds); // Generates a random value between the range declared above for the r distance that the electron will 
+                                                                       // move in this step. 
+    int thetaMovement = random(-thetaMovementBounds,thetaMovementBounds); // Generates a random value between -5 and 5 for the theta direction that the electron will move in this step.
     rCurrent = rCurrent - rMovement; // Updates the current r value.
     thetaCurrent = thetaCurrent + thetaMovement; // Updates the current theta value.
-    laser.sendto(rCurrent*COS(thetaCurrent)/maxSINCOSvalue, rCurrent*SIN(thetaCurrent)/maxSINCOSvalue); // Converts from polar to cartesian and moves the laser to the newly updates position.
+    laser.sendto(rCurrent*COS(thetaCurrent)/maxSINCOSvalue, rCurrent*SIN(thetaCurrent)/maxSINCOSvalue); // Converts from polar to cartesian and moves the laser to the newly updates 
+                                                                                                        // position.
   }
   laser.sendto(0, 0); // If the electron is within 100 pixels of the center of the detector the electric field value is so strong it will be pulled directily towards the center.
   laser.off(); // Turns off the laser as the pathing is now complete.
 }
 
+/* void electronDiskTrack()
+ * 
+ * Displays an electron track in the disk style within the projected detector. As the energy of the electron decreases the disk size of the electron decreases.
+ * 
+ */
 void electronDiskTrack() {
+  int rStrongElectricField = 100; // The radius for which the electrons get pulled directly into the center of the detector. Default is 100.
+  int rStartLowerBounds = 1028; // The closest value for which electrons can appear to the middle of the detector. Default is 1028.
+  int rStartUpperBounds = 2048; // The furthest value for which electrons can appear to the middle of the detector. Default is 2048 which is the maximum value.
+  int rMovementLowerBounds = 10; // The smallest step an electron can move after appearing. Default is 100.
+  int rMovementUpperBounds = 50; // The largest step an electron can move after appearing. Default is 500.
+  int thetaMovementBounds = 5; // The maximum angle in degrees for which the electron can move in one step. Default is 5.
+  int energyLowerBounds = 30; // The minimum energy for which an electron can be generated in keV. Default is 30.
+  int energyUpperBounds = 100; // The maximum energy for which an electron can be generated in keV. Default is 100.
+  int energyChangeLowerBounds = 1; // The minimum energy that an electron can lose in 1 interaction in keV. Default is 1.
+  int energyChangeUpperBounds = 10; // The maximum energy that an electron can lose in 1 interaction in keV. Default is 10.
+
+  const int maxSINCOSvalue = 16384; // The maximum value that SIN and COS can return. This value is used for scaling purposes. It shouldnt be changed. If it is for
+                                    // some reason the default value is 16384.
+                              
   laser.off(); // Makes sure the laser is off.
   randomSeed(0); // Randomizes the seed.
   
-  int rCurrent = random(1028, 2048); // Randomly returns the radius value for the electron to start at between 1028 and 2048.
+  int rCurrent = random(rStartLowerBounds, rStartUpperBounds); // Randomly returns the radius value for the electron to start at between 1028 and 2048.
   int thetaCurrent = random(0, 360); // Randomly returns the theta value for the electron to start at.
-
-  simulateTrack(100, rStart*COS(thetaStart)/16384, rStart*SIN(thetaStart)/16384); // Converts from polar to cartesian and creates the electron at the start position.
+  int energyCurrent = random(energyLowerBounds,energyUpperBounds);
+ 
+  simulateTrack(energyCurrent, rStart*COS(thetaStart)/maxSINCOSvalue, rStart*SIN(thetaStart)/maxSINCOSvalue); // Converts from polar to cartesian and creates the electron at the start 
+                                                                                                              // position.
   laser.on(); // Turns the laser on.
 
-  while(rCurrent > 100) { // While outside the inner radius where the electric field is weaker.                         
-    displayDetector();
-    int rMovement = random(10,50); // Generates a random value between 100 and 500 for the r distance that the electron will move in this step. 
-    int thetaMovement = random(-5,5); // Generates a random value between -35 and 35 for the theta direction that the electron will move in this step.
-    rCurrent = rCurrent - rMovement; // Updates the current r value.
+  while(rCurrent > rStrongElectricField && energyCurrent > 0) { // While outside the inner radius where the electric field is weaker and the electron still has energy.
+    displayDetector(); // Keeps the detector displayed as depending on the step size the detector can disappear when transversing within this function.
+    int rMovement = random(rMovementLowerBounds,rMovementUpperBounds); // Generates a random value between the declared values for the r distance that the electron will move in 
+                                                                       // this step. 
+    int thetaMovement = random(-thetaMovementBounds,thetaMovementBounds); // Generates a random value between the declared values for the theta direction that the electron will 
+                                                                          // move in this step.
+    int energyChange = random(energyChangeLowerBounds,energyChangeUpperBounds); // Generates a random value between the declared values for the energy the electron loses in an 
+                                                                                // interaction
+    rCurrent = rCurrent - rMovement; // Updates the current radius value.
     thetaCurrent = thetaCurrent + thetaMovement; // Updates the current theta value.
-    simulateTrack(100, rCurrent*COS(thetaCurrent)/16384, rCurrent*SIN(thetaCurrent)/16384); // Converts from polar to cartesian and creates the electron at the start position.
+    energyCurrent = energyCurrent - energyChange; // Updates the current energy value.
+    simulateTrack(energyCurrent, rCurrent*COS(thetaCurrent)/maxSINCOSvalue, rCurrent*SIN(thetaCurrent)/maxSINCOSvalue); // Converts from polar to cartesian and creates the electron at 
+                                                                                                                        // the start position.
   }
 
-  while (rCurrent <= 100 && 0 < rCurrent) {
-    displayDetector();
-    rCurrent = rCurrent - 20;
-    simulateTrack(100, rCurrent*COS(thetaCurrent)/16384, rCurrent*SIN(thetaCurrent)/16384); // If the electron is within 100 pixels of the center of the detector the electric field value is so strong it will be pulled directily towards the center.
+  while (rCurrent <= rStrongElectricField && 0 < rCurrent && energyCurrent > 0) { // While the electron is within the strong electric field range, the radius is larger then 0 and
+                                                                                  // the electron has energy. 
+    displayDetector(); // Keeps the detector displayed as depending on the step size the detector can disappear when transversing within this function.
+    int rMovement = random(rMovementLowerBounds,rMovementUpperBounds); // Generates a random value between the declared values for the r distance that the electron will move in 
+                                                                       // this step.
+    int energyChange = random(energyChangeLowerBounds,energyChangeUpperBounds); // Generates a random value between the declared values for the energy the electron loses in an 
+                                                                                // interaction
+    rCurrent = rCurrent - rMovement; // Updates the current radius value.
+    energyCurrent = energyCurrent - energyChange; // Updates the current energy value.
+    simulateTrack(energyCurrent, rCurrent*COS(thetaCurrent)/maxSINCOSvalue, rCurrent*SIN(thetaCurrent)/maxSINCOSvalue); // If the electron is within 100 pixels of the center of the 
+                                                                                                              // detector the electric field value is so strong it will be pulled 
+                                                                                                              // directily towards the center.
   }
   laser.off(); // Turns off the laser as the pathing is now complete.
 }
 
-void alphaTrack(int energy, int xStartLocation, int yStartLocation, int xEndLocation, int yEndLocation) {
-  
-}
-
+/* void displayDetector()
+ * 
+ * Displays the detector using a circle and a rod with the maximum resolution.
+ * 
+ */
 void displayDetector() {
-  laser.off();
-  const int scale = 8; // The value needed to convert from the larger scale of max value being 16384 to the smaller more appropriate scale of 2048.
-  laser.sendto(SIN(0)/scale, COS(0)/scale); // Moves the laser to the correct starting location.
+  int circleStepSize = 15; // Changes the step size as the for loop passes through the circle. Smaller values create more perfect circles. Default is 15.
+  
+  laser.off(); // Makes sure the laser is off. This was needed to avoid fencing at this point.
+  const int maxSINCOSvalue = 8; // The value needed to convert from the larger scale of max value being 16384 to the smaller more appropriate scale of 2048.
+  laser.sendto(SIN(0)/maxSINCOSvalue, COS(0)/maxSINCOSvalue); // Moves the laser to the correct starting location.
   laser.on(); // Now since we are in the correct location we can turn the laser on.
   
-  for (int r = 0;r<=360;r+=15) // Rotates through the angles of the circle with the provided step size.
+  for (int r = 0; r <= 360; r += circleStepSize) // Rotates through the angles of the circle with the provided step size.
   {    
-    laser.sendto(SIN(r)/scale, COS(r)/scale); // Displays the circle.
+    laser.sendto(SIN(r)/maxSINCOSvalue, COS(r)/maxSINCOSvalue); // Displays the circle.
   }
+  
   laser.off(); // After we have displayed the laser we can turn off the laser.
-
-  laser.sendto(0, -2048); laser.on(); laser.sendto(0,0); laser.off(); // Displays the rod.
+  laser.sendto(0, -2048); // Moves to the bottom portion of the rod.
+  laser.on();  // Turns on the laser.
+  laser.sendto(0,0); // Moves to the center of the circle .
+  laser.off(); // Turns the laser off.
 }
 
+/* void simulateTrack(int energy, int xMiddlePoint, int yMiddlePoint)
+ * 
+ * Simulates an electron track using a disk where the energy is represented as the size of the disk and the middle points of the disk can be specified.
+ * 
+ */
 void simulateTrack(int energy, int xMiddlePoint, int yMiddlePoint) {
   laser.sendto(SIN(0)*energy/16384 + xMiddlePoint, COS(0)*energy/16384 + yMiddlePoint);
   laser.on();
@@ -115,6 +165,11 @@ void simulateTrack(int energy, int xMiddlePoint, int yMiddlePoint) {
   laser.off();
 }
 
+/* initiateLaserForDetectorDisplay()
+ * 
+ * Initiates all the laser settings needed for scalled and offsets.
+ * 
+ */
 void initiateLaserForDetectorDisplay() {
   laser.setScale(1); // Sets the scaling to be normal (no multiplication factor applied to the image).
   laser.setOffset(2048,2048); // Sets the offset for the laser so the circles center corresponds to (0,0).
