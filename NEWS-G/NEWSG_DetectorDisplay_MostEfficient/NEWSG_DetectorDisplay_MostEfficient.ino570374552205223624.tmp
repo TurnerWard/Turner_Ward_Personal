@@ -4,8 +4,7 @@ Laser redlaser(5); // Initiates a red laser in the 5th arduino pin.
 //Laser greenlaser(3); // Initiates a green laser in the 3rd arduino pin.
 
 unsigned long currentMillis; // Can run for ~50 days.
-unsigned long nextAlphaEvent; // Can run for ~50 days.
-unsigned long nextElectronEvent; // Can run for ~50 days.
+unsigned long nextEvent; // Can run for ~50 days.
 
 void setup() {
   Serial.begin(9600);
@@ -17,21 +16,53 @@ void loop() {
   displayDetector(); // Displays the detector.
   
   currentMillis = millis(); // A timer.
-
-  if(nextElectronEvent < currentMillis) {
-    electronDiskTrack();
-    nextElectronEvent = millis() + random(500, 2000);
-  }
-  
-  if(nextAlphaEvent < currentMillis) {   
+  if(nextEvent < currentMillis) {   
     alphaDiskTrack();
-    nextAlphaEvent = millis() + random(3000, 5000);
+    nextEvent = millis() + random(500, 3000);
   }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////// HELPER FUNCTIONS ////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////
+
+/* void electronLineTrack()
+ * 
+ * Displays an electron track in the line style within the projected detector.
+ * 
+ */
+void electronLineTrack() {
+  int rStrongElectricField = 100; // The radius for which the electrons get pulled directly into the center of the detector. Default is 100.
+  int rStartLowerBounds = 1028; // The closest value for which electrons can appear to the middle of the detector. Default is 1028.
+  int rStartUpperBounds = 2048; // The furthest value for which electrons can appear to the middle of the detector. Default is 2048 which is the maximum value.
+  int rMovementLowerBounds = 100; // The smallest step an electron can move after appearing. Default is 100.
+  int rMovementUpperBounds = 500; // The largest step an electron can move after appearing. Default is 500.
+  int thetaMovementBounds = 5; // The maximum angle in degrees for which the electron can move in one step. Default is 5.
+
+  const int maxSINCOSvalue = 16384; // The maximum value that SIN and COS can return. This value is used for scaling purposes. It shouldnt be changed. If it is for
+                                    // some reason the default value is 16384.
+  
+  redlaser.off(); // Makes sure the laser is off.
+  randomSeed(0); // Randomizes the seed.
+  
+  int rCurrent = random(rStartLowerBounds,rStartUpperBounds); // Randomly returns the radius value for the electron to start at between the upper and lower bounds.
+  int thetaCurrent = random(0,360); // Randomly returns the theta value for the electron to start at.
+
+  redlaser.sendto(rCurrent*COS(thetaCurrent)/maxSINCOSvalue, rCurrent*SIN(thetaCurrent)/maxSINCOSvalue); // Converts from polar to cartesian and moves the laser to the start position.
+  redlaser.on(); // Turns the laser on.
+
+  while(rCurrent > rStrongElectricField) { // While outside the inner radius where the electric field is weaker.                
+    int rMovement = random(rMovementLowerBounds,rMovementUpperBounds); // Generates a random value between the range declared above for the r distance that the electron will 
+                                                                       // move in this step. 
+    int thetaMovement = random(-thetaMovementBounds,thetaMovementBounds); // Generates a random value between -5 and 5 for the theta direction that the electron will move in this step.
+    rCurrent = rCurrent - rMovement; // Updates the current r value.
+    thetaCurrent = thetaCurrent + thetaMovement; // Updates the current theta value.
+    redlaser.sendto(rCurrent*COS(thetaCurrent)/maxSINCOSvalue, rCurrent*SIN(thetaCurrent)/maxSINCOSvalue); // Converts from polar to cartesian and moves the laser to the newly updates 
+                                                                                                        // position.
+  }
+  redlaser.sendto(0, 0); // If the electron is within 100 pixels of the center of the detector the electric field value is so strong it will be pulled directily towards the center.
+  redlaser.off(); // Turns off the laser as the pathing is now complete.
+}
 
 /* void electronDiskTrack()
  * 
@@ -102,9 +133,9 @@ void electronDiskTrack() {
 void alphaDiskTrack() {
   int rStartLowerBounds = 0; // The minimum radius value for which an alpha can be generated.
   int rStartUpperBounds = 2000; // The maximum radius value for which an alpha can be generated.
-  int movementBounds = 25; // The largest step an alpha can move after appearing. Default is 25.
+  int movementBounds = 15; // The largest step an alpha can move after appearing. Default is 15.
   int energyLowerBounds = 150; // The minimum energy for which an alpha can be generated in keV. Default is 150.
-  int energyUpperBounds = 250; // The maximum energy for which an alpha can be generated in keV. Default is 250.
+  int energyUpperBounds = 300; // The maximum energy for which an alpha can be generated in keV. Default is 300.
   int energyChangeLowerBounds = 0; // The minimum energy that an alpha can lose in 1 interaction in keV. Default is 0.
   int energyChangeUpperBounds = 2; // The maximum energy that an alpha can lose in 1 interaction in keV. Default is 2.
   int maximumRadius = 2048;
@@ -126,12 +157,18 @@ void alphaDiskTrack() {
   
   int xMovement = random(-movementBounds,movementBounds); // Generates a random value for x between the bounds.
   int yMovement = random(-movementBounds,movementBounds); // Generates a random value for y between the bounds.
-  
-  while(sqrt(pow(xCurrent,2) + pow(yCurrent,2)) < maximumRadius && energyCurrent > 0) { // While outside the inner radius where the electric field is weaker and the electron still has energy.
+  int energyChange = random(energyChangeLowerBounds,energyChangeUpperBounds); // Generates a random value between the declared values for the energy the electron loses in an 
+
+  while(sqrt(xCurrent*xCurrent + yCurrent*yCurrent) < maximumRadius && energyCurrent > 0) { // While outside the inner radius where the electric field is weaker and the electron still has energy.
     displayDetector(); // Keeps the detector displayed as depending on the step size the detector can disappear when transversing within this function.
+    int energyChange = random(energyChangeLowerBounds,energyChangeUpperBounds); // Generates a random value between the declared values for the energy the electron loses in an 
+                                                                                // interaction
     xCurrent = xCurrent + xMovement; // Updates the current x position value.
     yCurrent = yCurrent + yMovement; // Updates the current y position value.
+    energyCurrent = energyCurrent - energyChange; // Updates the current energy value.
     simulateTrack(energyCurrent, xCurrent, yCurrent); // Updates the alphas position.  
+    Serial.print(xCurrent);
+    Serial.println(sqrt(xCurrent*xCurrent + yCurrent*yCurrent));
   }
   redlaser.off(); // Turns off the laser as the pathing is now complete.
 }
