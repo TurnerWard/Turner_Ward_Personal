@@ -1,31 +1,39 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//                NEWS-G Detector Display using a DAC and Thorlabs Galvo System                   //
+//                                                                                                //
+//  Made by: Turner Ward                                                                          //
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "Laser.h"
 
 Laser redlaser(5); // Initiates a red laser in the 5th arduino pin.
 
 typedef struct Electron { // Creates an Electron struct.
-  int rLocation;
+  int rLocation;      // An electron is made up of a radial location, and angular location, and an energy.
   int thetaLocation;
   int energy;
 };
 
 typedef struct Alpha { // Creates an Alpha struct.
-  int xLocation;
+  int xLocation;  // An alpha is made up of a x location, a y location, an energy, and a constant value for the movement in both the x direction and y direction.
   int yLocation;
   int energy;
   int xMovement;
   int yMovement;
 };
 
-int numElectronLocationsInArray = 6;
-Electron alphaElectrons[6]; // Creates an array of 6 electrons.
-int alphaElectronLocation = 0;
+int numElectronLocationsInArray = 6; // The number of electrons that can be tracked. 6 seems to be a reasonable value but can be increased if more then two alphas are wanted.
+Electron alphaElectrons[6]; // Creates an array of 6 electrons. The value within the array needs to be equal to that of the numElectronLocationInArray variable.
+int alphaElectronLocation = 0; // The current location for which an electron should be added in.
 
-Alpha alpha1; // Defines the alphas that will be moving within the detector.
-Alpha alpha2;
+Alpha alpha1; // Defines the alphas that will be moving within the detector. In the case for which this was last editing there are two alphas that are active within the detector. These
+Alpha alpha2; // alphas have the names alpha1 and alpha2 respectively....very creative names.
 
 void setup() {
-  redlaser.init(); // Initiates the laser which also initiates the dac.
+  redlaser.init(); // Initiates the red laser which also initiates the dac.
   initiateLaserForDetectorDisplay(); // Initates the laser settings for the detector.
+  
   alpha1 = createNewAlpha(); // Initiates the alphas.
   alpha2 = createNewAlpha();
 }
@@ -71,19 +79,19 @@ Alpha createNewAlpha() {
   int movementBounds = 25; // The largest step an alpha can move after appearing. Default is 25.
   int lowestSpeed = 20; // The lowest speed at which an alpha can travel. Default is 20.
 
-  const int maxSINCOSvalue = 16384;
+  const int maxSINCOSvalue = 16384; // The largest value that can be returned from the SIN and COS functions as declared in Basics.cpp. This should remain 16384.
 
-  randomSeed(0); // Randomizes the seed.
+  randomSeed(0); // Randomizes the seed. This in theory adds another layer of random to the code.
 
   int rCurrent = random(rStartLowerBounds, rStartUpperBounds); // Randomly returns the radius value for the alpha to start at between 1028 and 2048.
   int thetaCurrent = random(0, 360); // Randomly returns the theta value for the alpha to start at.
   int xCurrent = rCurrent * COS(thetaCurrent) / maxSINCOSvalue; // Converts from polar to cartesian where the movement of alpha particles are more easily replicated.
   int yCurrent = rCurrent * SIN(thetaCurrent) / maxSINCOSvalue; // Converts from polar to cartesian where the movement of alpha particles are more easily replicated.
   int energyCurrent = random(energyLowerBounds, energyUpperBounds); // Generates the starting energy value of the alpha.
-  int xMovement = random(-movementBounds, movementBounds);;
-  int yMovement = random(-movementBounds, movementBounds);;
+  int xMovement = random(-movementBounds, movementBounds); // Determines the initial values for the x and y movement.
+  int yMovement = random(-movementBounds, movementBounds);
 
-  while (sqrt(pow(xMovement, 2) + pow(yMovement, 2)) < lowestSpeed) {
+  while (sqrt(pow(xMovement, 2) + pow(yMovement, 2)) < lowestSpeed) { // Computes the speed of the alpha from the velocity vectors. This speed must be faster then the minumum value.
     xMovement = random(-movementBounds, movementBounds); // Generates a random value for x between the bounds.
     yMovement = random(-movementBounds, movementBounds); // Generates a random value for y between the bounds.
   }
@@ -105,14 +113,15 @@ Electron computeNextElectronLocation(Electron electron) {
   int energyChangeLowerBounds = 1; // The minimum energy that an electron can lose in 1 interaction in keV. Default is 1.
   int energyChangeUpperBounds = 5; // The maximum energy that an electron can lose in 1 interaction in keV. Default is 5.
 
-  const int maxSINCOSvalue = 16384;
+  const int maxSINCOSvalue = 16384; // The largest value that can be returned from the SIN and COS functions as declared in Basics.cpp. This should remain 16384.
 
-  randomSeed(0); // Randomizes the seed.
-  int rCurrent = electron.rLocation; // Saves the passed in rLocation, thetaLocation, and energy values that are pointed to from the electron pointer.
+  randomSeed(0); // Randomizes the seed. This in theory adds another layer of random to the code.
+  
+  int rCurrent = electron.rLocation; // Saves the passed in rLocation, thetaLocation, and energy values that are pointed to from the electron struct.
   int thetaCurrent = electron.thetaLocation;
   int energyCurrent = electron.energy;
   
-  if (rCurrent > 0 && energyCurrent > 0) {
+  if (rCurrent > 0 && energyCurrent > 0) { // If the electron exists (ie. has a radius that is not at the center of the detector and has a positive energy).
     if (rCurrent > rStrongElectricField && energyCurrent > 0) { // While outside the inner radius where the electric field is weaker and the electron still has energy.
       int rMovement = random(rMovementLowerBounds, rMovementUpperBounds); // Generates a random value between the declared values for the r change.
       int thetaMovement = random(-thetaMovementBounds, thetaMovementBounds); // Generates a random value between the declared values for the theta change.
@@ -138,7 +147,6 @@ Electron computeNextElectronLocation(Electron electron) {
   }
   else {
     Electron newElectron = {0, 0, 0}; // Effectively destroys the electron and holds it at (0,0) with no energy.
-    //Electron newElectron = createNewElectron();
     return newElectron;
   }
 }
@@ -149,9 +157,10 @@ Electron computeNextElectronLocation(Electron electron) {
 
 */
 Alpha computeNextAlphaLocation(Alpha alpha) {
-  const int maximumRadius = 2000;
-  int energyChangeLowerBounds = 60;
-  int energyChangeUpperBounds = 100;
+  const int maximumRadius = 2000; // Defines the maxmimum radius value an alpha can reach before it gets obliterated. Default is 2000.
+  int energyChangeLowerBounds = 60; // The smallest energy value the alpha can "lose" in one step. This is the minimum energy that can be transfered to an electron. Default is 60 keV.
+  int energyChangeUpperBounds = 100; // The largest energy value the alpha can "lose" in one step. This is the maxium energy that can be transfered to an electron. Default is 100 keV.
+  int alphaEnergyChangeDivider = 4; // The divider that controls the ratio of energy for which the electron gains compared to the alpha losing. Default is 4. 
 
   randomSeed(0); // Randomizes the seed.
 
@@ -159,28 +168,28 @@ Alpha computeNextAlphaLocation(Alpha alpha) {
   int yCurrent = alpha.yLocation + alpha.yMovement;
   int energyCurrent = alpha.energy;
 
-  if (sqrt(pow(xCurrent, 2) + pow(yCurrent, 2)) < maximumRadius && energyCurrent > 0) {
-    int energyChange = random(energyChangeLowerBounds, energyChangeUpperBounds);
+  if (sqrt(pow(xCurrent, 2) + pow(yCurrent, 2)) < maximumRadius && energyCurrent > 0) { // If the alpha is within the max radius value and has a positive energy.
+    int energyChange = random(energyChangeLowerBounds, energyChangeUpperBounds); // Calculates the energy change that the electron will gain if created in keV.
     if (random(0, 101) > 95) { // Results in a 5% chance to generate an electron with each step.
-      alphaElectrons[alphaElectronLocation] = generateElectron(xCurrent, yCurrent, energyChange);
-      energyCurrent = energyCurrent - energyChange / 4; // Lowers the energy of the alpha.
-      alphaElectronLocation++;
+      alphaElectrons[alphaElectronLocation] = generateElectron(xCurrent, yCurrent, energyChange); // Generates an electron and saves it.
+      energyCurrent = energyCurrent - energyChange / alphaEnergyChangeDivider; // Lowers the energy of the alpha.
+      alphaElectronLocation++; // Increases the count for which the next electron will be added into the array.
       if (alphaElectronLocation == numElectronLocationsInArray) { // If the array is filled rotate around and start filling it again.
-        alphaElectronLocation = 0;
+        alphaElectronLocation = 0; // Resets the array position counter to 0.
       }
     }
 
-    for(int loc = 0; loc < numElectronLocationsInArray; loc++) {
-      alphaElectrons[loc] = computeNextElectronLocation(alphaElectrons[loc]); // Computes and moves the electon through its step.
+    for(int loc = 0; loc < numElectronLocationsInArray; loc++) { // For every position in the array...
+      alphaElectrons[loc] = computeNextElectronLocation(alphaElectrons[loc]); // Computes and moves the electon through its current step.
     }
     
     simulateTrack(energyCurrent, xCurrent, yCurrent); // Updates the alphas position.
     Alpha newAlpha = {xCurrent, yCurrent, energyCurrent, alpha.xMovement, alpha.yMovement}; // Creates the new alpha with the new values.
     return newAlpha; // Returns this new electron.
   }
-  else {
-    Alpha newAlpha = createNewAlpha();
-    return newAlpha;
+  else { // If the alpha has left the detector or has no more energy...
+    Alpha newAlpha = createNewAlpha(); // Create a new alpha.
+    return newAlpha; // Returns the new alpha so that the infinite loop can be continued.
   }
 }
 
@@ -215,12 +224,12 @@ void displayDetector() {
 
 */
 void simulateTrack(int energy, int xMiddlePoint, int yMiddlePoint) {
-  redlaser.sendto(SIN(0)*energy / 16384 + xMiddlePoint, COS(0)*energy / 16384 + yMiddlePoint);
-  redlaser.on();
-  for (int r = 0; r <= 360; r += 60) {
-    redlaser.sendto(SIN(r)*energy / 16384 + xMiddlePoint, COS(r)*energy / 16384 + yMiddlePoint);
+  redlaser.sendto(SIN(0)*energy / 16384 + xMiddlePoint, COS(0)*energy / 16384 + yMiddlePoint); // Moves the laser to the first location of the disk.
+  redlaser.on(); // Turns the laser on.
+  for (int r = 0; r <= 360; r += 60) { // Flips through the circle degrees in steps of 60.
+    redlaser.sendto(SIN(r)*energy / 16384 + xMiddlePoint, COS(r)*energy / 16384 + yMiddlePoint); // Moves the laser around the circle in steps of 60.
   }
-  redlaser.off();
+  redlaser.off(); // At the end turns off the laser.
 }
 
 /* initiateLaserForDetectorDisplay()
