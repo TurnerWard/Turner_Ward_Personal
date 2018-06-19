@@ -53,24 +53,9 @@ Electron generateElectron(int xLocation, int yLocation, int energyDeposited) {
   return newElectron; // Returns the electron struct.
 }
 
-Electron createNewElectron() {
-  int rStartLowerBounds = 0; // The closest value for which electrons can appear to the middle of the detector. Default is 1028.
-  int rStartUpperBounds = 2048; // The furthest value for which electrons can appear to the middle of the detector. Default is 2048 which is the maximum value.
-  int energyLowerBounds = 70; // The minimum energy for which an electron can be generated in keV. Default is 70.
-  int energyUpperBounds = 200; // The maximum energy for which an electron can be generated in keV. Default is 200.
-
-  randomSeed(0); // Randomizes the seed.
-  int rCurrent = random(rStartLowerBounds, rStartUpperBounds); // Randomly returns the radius value for the electron to start at between 1028 and 2048.
-  int thetaCurrent = random(0, 360); // Randomly returns the theta value for the electron to start at.
-  int energyCurrent = random(energyLowerBounds, energyUpperBounds);
-
-  Electron newElectron = {rCurrent, thetaCurrent, energyCurrent}; // Creates the new elecron with the new values.
-  return newElectron; // Returns this new electron.
-}
-
 Alpha createNewAlpha() {
-  int rStartLowerBounds = 2000; // The minimum radius value for which an alpha can be generated.
-  int rStartUpperBounds = 2048; // The maximum radius value for which an alpha can be generated.
+  int rStartLowerBounds = 2000; // The minimum radius value for which an alpha can be generated. Default is 2000.
+  int rStartUpperBounds = 2048; // The maximum radius value for which an alpha can be generated. Default is 2048.
   int energyLowerBounds = 150; // The minimum energy for which an alpha can be generated in keV. Default is 150.
   int energyUpperBounds = 250; // The maximum energy for which an alpha can be generated in keV. Default is 250.
   int movementBounds = 25; // The largest step an alpha can move after appearing. Default is 25.
@@ -78,7 +63,7 @@ Alpha createNewAlpha() {
 
   const int maxSINCOSvalue = 16384;
 
-  randomSeed(0); // Randomizes the seed.
+  randomSeed(0); // Randomizesc the seed.
 
   int rCurrent = random(rStartLowerBounds, rStartUpperBounds); // Randomly returns the radius value for the alpha to start at between 1028 and 2048.
   int thetaCurrent = random(0, 360); // Randomly returns the theta value for the alpha to start at.
