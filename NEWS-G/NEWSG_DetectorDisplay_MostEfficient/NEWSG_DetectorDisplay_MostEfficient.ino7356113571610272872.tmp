@@ -17,8 +17,6 @@ typedef struct Alpha { // Creates an Alpha struct.
   int xLocation;   
   int yLocation;      
   int energy;
-  int xMovement;
-  int yMovement;
 };
 
 Electron electron1;
@@ -28,7 +26,6 @@ Electron electron4;
 Electron electron5;
 
 Alpha alpha1;
-Alpha alpha2;
 
 void setup() {
   Serial.begin(9600);
@@ -39,29 +36,26 @@ void setup() {
   electron2 = createNewElectron();
   electron3 = createNewElectron();
   electron4 = createNewElectron();
-  //electron5 = createNewElectron();
+  electron5 = createNewElectron();
 
   alpha1 = createNewAlpha();
-  alpha2 = createNewAlpha();
 }
 
 void loop() {
   displayDetector();
-  
   electron1 = computeNextElectronLocation(electron1);
   electron2 = computeNextElectronLocation(electron2);
   electron3 = computeNextElectronLocation(electron3);
   electron4 = computeNextElectronLocation(electron4);
-  
+  electron5 = computeNextElectronLocation(electron5);
   alpha1 = computeNextAlphaLocation(alpha1);
-  alpha2 = computeNextAlphaLocation(alpha2);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////// TESTER FUNCTIONS ////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-Electron createRandomNewElectron() {
+Electron createNewElectron() {
   int rStartLowerBounds = 0; // The closest value for which electrons can appear to the middle of the detector. Default is 1028.
   int rStartUpperBounds = 2048; // The furthest value for which electrons can appear to the middle of the detector. Default is 2048 which is the maximum value.
   int energyLowerBounds = 70; // The minimum energy for which an electron can be generated in keV. Default is 70.
@@ -76,12 +70,11 @@ Electron createRandomNewElectron() {
   return newElectron; // Returns this new electron.
 }
 
-Alpha createRandomNewAlpha() {
+Alpha createNewAlpha() {
   int rStartLowerBounds = 0; // The minimum radius value for which an alpha can be generated.
-  int rStartUpperBounds = 2000; // The maximum radius value for which an alpha can be generated.
+  int rStartUpperBounds = 2048; // The maximum radius value for which an alpha can be generated.
   int energyLowerBounds = 150; // The minimum energy for which an alpha can be generated in keV. Default is 150.
   int energyUpperBounds = 250; // The maximum energy for which an alpha can be generated in keV. Default is 250.
-  int movementBounds = 25; // The largest step an alpha can move after appearing. Default is 25.
 
   const int maxSINCOSvalue = 16384;
   
@@ -92,15 +85,8 @@ Alpha createRandomNewAlpha() {
   int xCurrent = rCurrent * COS(thetaCurrent) / maxSINCOSvalue; // Converts from polar to cartesian where the movement of alpha particles are more easily replicated.
   int yCurrent = rCurrent * SIN(thetaCurrent) / maxSINCOSvalue; // Converts from polar to cartesian where the movement of alpha particles are more easily replicated.
   int energyCurrent = random(energyLowerBounds, energyUpperBounds); // Generates the starting energy value of the alpha.
-  int xMovement = random(-movementBounds, movementBounds); // Generates a random value for x between the bounds.
-  int yMovement = random(-movementBounds, movementBounds); // Generates a random value for y between the bounds.
 
-  while(sqrt(pow(xMovement,2)+pow(yMovement,2)) < 5 && sqrt(pow(xMovement,2)+pow(yMovement,2)) > 20){
-      xMovement = random(-movementBounds, movementBounds); // Generates a random value for x between the bounds.
-      yMovement = random(-movementBounds, movementBounds); // Generates a random value for y between the bounds.
-  }
-
-  Alpha newAlpha = {xCurrent, yCurrent, energyCurrent, xMovement, yMovement}; // Creates the new alpha with the new values.
+  Alpha newAlpha = {xCurrent, yCurrent, energyCurrent}; // Creates the new alpha with the new values.
   return newAlpha; // Returns this new alpha.
 }
 
@@ -151,21 +137,30 @@ Electron computeNextElectronLocation(Electron electron) {
 }
 
 Alpha computeNextAlphaLocation(Alpha alpha) {
+  int movementBounds = 25; // The largest step an alpha can move after appearing. Default is 25.
+
   const int maximumRadius = 2048;
+  const int maxSINCOSvalue = 16384;
   
   randomSeed(0); // Randomizes the seed.
 
-  int xCurrent = alpha.xLocation + alpha.xMovement; // Saves the passed in xLocation, yLocation, and energy values.
-  int yCurrent = alpha.yLocation + alpha.yMovement;
+  int xCurrent = alpha.xLocation; // Saves the passed in xLocation, yLocation, and energy values.
+  int yCurrent = alpha.yLocation;
   int energyCurrent = alpha.energy;
-  
+
+  int xMovement = random(-movementBounds, movementBounds); // Generates a random value for x between the bounds.
+  int yMovement = random(-movementBounds, movementBounds); // Generates a random value for y between the bounds.
+
   if(sqrt(pow(xCurrent,2)+pow(yCurrent,2)) < maximumRadius) {
+    xCurrent = xCurrent + xMovement; // Updates the current x position value.
+    yCurrent = yCurrent + yMovement; // Updates the current y position value.
+    
     simulateTrack(energyCurrent, xCurrent, yCurrent); // Updates the alphas position.
-    Alpha newAlpha = {xCurrent, yCurrent, energyCurrent, alpha.xMovement, alpha.yMovement}; // Creates the new alpha with the new values.
-    return newAlpha; // Returns this new electron.
+    Alpha newAlpha = createNewAlpha();
+    return newAlpha;
   }
   else {
-    Alpha newAlpha = createNewAlpha();
+    Alpha newAlpha = createNewAlpha);
     return newAlpha;
   }
 }
@@ -305,7 +300,7 @@ void alphaDiskTrack() {
 
 */
 void displayDetector() {
-  int circleStepSize = 20; // Changes the step size as the for loop passes through the circle. Smaller values create more perfect circles. Default is 15.
+  int circleStepSize = 15; // Changes the step size as the for loop passes through the circle. Smaller values create more perfect circles. Default is 15.
 
   redlaser.off(); // Makes sure the laser is off. This was needed to avoid fencing at this point.
   const int smallestSINCOSvalue = 8; // The value needed to convert from the larger scale of max value being 16384 to the smaller more appropriate scale of 2048.
@@ -332,7 +327,7 @@ void displayDetector() {
 void simulateTrack(int energy, int xMiddlePoint, int yMiddlePoint) {
   redlaser.sendto(SIN(0)*energy / 16384 + xMiddlePoint, COS(0)*energy / 16384 + yMiddlePoint);
   redlaser.on();
-  for (int r = 0; r <= 360; r += 60) {
+  for (int r = 0; r <= 360; r += 45) {
     redlaser.sendto(SIN(r)*energy / 16384 + xMiddlePoint, COS(r)*energy / 16384 + yMiddlePoint);
   }
   redlaser.off();
