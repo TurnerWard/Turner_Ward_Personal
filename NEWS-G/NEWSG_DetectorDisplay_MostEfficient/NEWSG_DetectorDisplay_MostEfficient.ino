@@ -30,7 +30,7 @@ void setup() {
   alpha2 = createNewAlpha();
 }
 
-void loop() {
+void loop() { 
   displayDetector(); // Displays the detector.
 
   alpha1 = computeNextAlphaLocation(alpha1); // Updates the alphas next locations.
@@ -38,9 +38,14 @@ void loop() {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////// TESTER FUNCTIONS ////////////////////////////////////////
+//////////////////////////////////////// HELPER FUNCTIONS ////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
+/* Electron generateElectron(int xLocation, int yLocation, int energyDeposited)
+
+   Creates a new electron given the location and energy level you wish it to contain.
+
+*/
 Electron generateElectron(int xLocation, int yLocation, int energyDeposited) {
   Electron newElectron; // Creates a new electron using the electron struct.
   if(yLocation >= 0) // If in the upper two quadrants.
@@ -53,6 +58,11 @@ Electron generateElectron(int xLocation, int yLocation, int energyDeposited) {
   return newElectron; // Returns the electron struct.
 }
 
+/* Alpha createNewAlpha()
+
+   Creates a new Alpha particle with random properties.
+
+*/
 Alpha createNewAlpha() {
   int rStartLowerBounds = 2000; // The minimum radius value for which an alpha can be generated. Default is 2000.
   int rStartUpperBounds = 2048; // The maximum radius value for which an alpha can be generated. Default is 2048.
@@ -63,7 +73,7 @@ Alpha createNewAlpha() {
 
   const int maxSINCOSvalue = 16384;
 
-  randomSeed(0); // Randomizesc the seed.
+  randomSeed(0); // Randomizes the seed.
 
   int rCurrent = random(rStartLowerBounds, rStartUpperBounds); // Randomly returns the radius value for the alpha to start at between 1028 and 2048.
   int thetaCurrent = random(0, 360); // Randomly returns the theta value for the alpha to start at.
@@ -82,6 +92,11 @@ Alpha createNewAlpha() {
   return newAlpha; // Returns this new alpha.
 }
 
+/* Electron computeNextElectronLocation(Electron electron)
+
+   Determines the next location for which a given electron will move depending on its current location.
+
+*/
 Electron computeNextElectronLocation(Electron electron) {
   int rStrongElectricField = 100; // The radius for which the electrons get pulled directly into the center of the detector. Default is 100.
   int rMovementLowerBounds = 40; // The smallest step an electron can move after appearing. Default is 10.
@@ -128,6 +143,11 @@ Electron computeNextElectronLocation(Electron electron) {
   }
 }
 
+/* Alpha computeNextAlphaLocation(Alpha alpha)
+
+   Determines the next location for which a given alpha will move along with determining if an electron should appear and controlling said electrons.
+
+*/
 Alpha computeNextAlphaLocation(Alpha alpha) {
   const int maximumRadius = 2000;
   int energyChangeLowerBounds = 60;
@@ -162,135 +182,6 @@ Alpha computeNextAlphaLocation(Alpha alpha) {
     Alpha newAlpha = createNewAlpha();
     return newAlpha;
   }
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////
-
-/*
-  void loop() {
-  displayDetector(); // Displays the detector.
-
-  currentMillis = millis(); // A timer.
-
-  if(nextElectronEvent < currentMillis) {
-    electronDiskTrack();
-    nextElectronEvent = millis() + random(500, 2000);
-  }
-
-  if(nextAlphaEvent < currentMillis) {
-    alphaDiskTrack();
-    nextAlphaEvent = millis() + random(3000, 5000);
-  }
-  }
-*/
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////// HELPER FUNCTIONS ////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
-
-/* void electronDiskTrack()
-
-   Displays an electron track in the disk style within the projected detector. As the energy of the electron decreases the disk size of the electron decreases.
-
-*/
-void electronDiskTrack() {
-  int rStrongElectricField = 100; // The radius for which the electrons get pulled directly into the center of the detector. Default is 100.
-  int rStartLowerBounds = 1028; // The closest value for which electrons can appear to the middle of the detector. Default is 1028.
-  int rStartUpperBounds = 2048; // The furthest value for which electrons can appear to the middle of the detector. Default is 2048 which is the maximum value.
-  int rMovementLowerBounds = 10; // The smallest step an electron can move after appearing. Default is 10.
-  int rMovementUpperBounds = 50; // The largest step an electron can move after appearing. Default is 50.
-  int thetaMovementBounds = 5; // The maximum angle in degrees for which the electron can move in one step. Default is 5.
-  int energyLowerBounds = 70; // The minimum energy for which an electron can be generated in keV. Default is 70.
-  int energyUpperBounds = 200; // The maximum energy for which an electron can be generated in keV. Default is 200.
-  int energyChangeLowerBounds = 1; // The minimum energy that an electron can lose in 1 interaction in keV. Default is 1.
-  int energyChangeUpperBounds = 5; // The maximum energy that an electron can lose in 1 interaction in keV. Default is 5.
-
-  const int maxSINCOSvalue = 16384; // The maximum value that SIN and COS can return. This value is used for scaling purposes. It shouldnt be changed. If it is for
-  // some reason the default value is 16384.
-
-  redlaser.off(); // Makes sure the laser is off.
-  randomSeed(0); // Randomizes the seed.
-
-  int rCurrent = random(rStartLowerBounds, rStartUpperBounds); // Randomly returns the radius value for the electron to start at between 1028 and 2048.
-  int thetaCurrent = random(0, 360); // Randomly returns the theta value for the electron to start at.
-  int energyCurrent = random(energyLowerBounds, energyUpperBounds);
-
-  simulateTrack(energyCurrent, rCurrent * COS(thetaCurrent) / maxSINCOSvalue, rCurrent * SIN(thetaCurrent) / maxSINCOSvalue); // Converts from polar to cartesian and creates the electron at
-  // the start position.
-  redlaser.on(); // Turns the laser on.
-
-  while (rCurrent > rStrongElectricField && energyCurrent > 0) { // While outside the inner radius where the electric field is weaker and the electron still has energy.
-    displayDetector(); // Keeps the detector displayed as depending on the step size the detector can disappear when transversing within this function.
-    int rMovement = random(rMovementLowerBounds, rMovementUpperBounds); // Generates a random value between the declared values for the r distance that the electron will move in
-    // this step.
-    int thetaMovement = random(-thetaMovementBounds, thetaMovementBounds); // Generates a random value between the declared values for the theta direction that the electron will
-    // move in this step.
-    int energyChange = random(energyChangeLowerBounds, energyChangeUpperBounds); // Generates a random value between the declared values for the energy the electron loses in an
-    // interaction
-    rCurrent = rCurrent - rMovement; // Updates the current radius value.
-    thetaCurrent = thetaCurrent + thetaMovement; // Updates the current theta value.
-    energyCurrent = energyCurrent - energyChange; // Updates the current energy value.
-    simulateTrack(energyCurrent, rCurrent * COS(thetaCurrent) / maxSINCOSvalue, rCurrent * SIN(thetaCurrent) / maxSINCOSvalue); // Converts from polar to cartesian and creates the electron at
-    // the start position.
-  }
-
-  while (rCurrent <= rStrongElectricField && 0 < rCurrent && energyCurrent > 0) { // While the electron is within the strong electric field range, the radius is larger then 0 and
-    // the electron has energy.
-    displayDetector(); // Keeps the detector displayed as depending on the step size the detector can disappear when transversing within this function.
-    int rMovement = random(rMovementLowerBounds, rMovementUpperBounds); // Generates a random value between the declared values for the r distance that the electron will move in
-    // this step.
-    int energyChange = random(energyChangeLowerBounds, energyChangeUpperBounds); // Generates a random value between the declared values for the energy the electron loses in an
-    // interaction
-    rCurrent = rCurrent - rMovement; // Updates the current radius value.
-    energyCurrent = energyCurrent - energyChange; // Updates the current energy value.
-    simulateTrack(energyCurrent, rCurrent * COS(thetaCurrent) / maxSINCOSvalue, rCurrent * SIN(thetaCurrent) / maxSINCOSvalue); // If the electron is within 100 pixels of the center of the
-    // detector the electric field value is so strong it will be pulled
-    // directily towards the center.
-  }
-  redlaser.off(); // Turns off the laser as the pathing is now complete.
-}
-
-/* alphaDiskTrack()
-
-     Displays an alpha track in the disk style within the projected detector. As the energy of the electron decreases the disk size of the electron decreases.
-*/
-void alphaDiskTrack() {
-  int rStartLowerBounds = 0; // The minimum radius value for which an alpha can be generated.
-  int rStartUpperBounds = 2000; // The maximum radius value for which an alpha can be generated.
-  int movementBounds = 25; // The largest step an alpha can move after appearing. Default is 25.
-  int energyLowerBounds = 150; // The minimum energy for which an alpha can be generated in keV. Default is 150.
-  int energyUpperBounds = 250; // The maximum energy for which an alpha can be generated in keV. Default is 250.
-  int energyChangeLowerBounds = 0; // The minimum energy that an alpha can lose in 1 interaction in keV. Default is 0.
-  int energyChangeUpperBounds = 2; // The maximum energy that an alpha can lose in 1 interaction in keV. Default is 2.
-  int maximumRadius = 2048;
-
-  const int maxSINCOSvalue = 16384; // The maximum value that SIN and COS can return. This value is used for scaling purposes. It shouldnt be changed. If it is for
-  // some reason the default value is 16384.
-
-  redlaser.off(); // Makes sure the laser is off.
-  randomSeed(0); // Randomizes the seed.
-
-  int rCurrent = random(rStartLowerBounds, rStartUpperBounds); // Randomly returns the radius value for the alpha to start at between 1028 and 2048.
-  int thetaCurrent = random(0, 360); // Randomly returns the theta value for the alpha to start at.
-  int xCurrent = rCurrent * COS(thetaCurrent) / maxSINCOSvalue; // Converts from polar to cartesian where the movement of alpha particles are more easily replicated.
-  int yCurrent = rCurrent * SIN(thetaCurrent) / maxSINCOSvalue; // Converts from polar to cartesian where the movement of alpha particles are more easily replicated.
-  int energyCurrent = random(energyLowerBounds, energyUpperBounds); // Generates the starting energy value of the alpha.
-
-  simulateTrack(energyCurrent, xCurrent, yCurrent); // Generates the correctly sized disk at the starting locaton.
-  redlaser.on(); // Turns the laser on.
-
-  int xMovement = random(-movementBounds, movementBounds); // Generates a random value for x between the bounds.
-  int yMovement = random(-movementBounds, movementBounds); // Generates a random value for y between the bounds.
-
-  while (sqrt(pow(xCurrent, 2) + pow(yCurrent, 2)) < maximumRadius && energyCurrent > 0) { // While outside the inner radius where the electric field is weaker and the electron still has energy.
-    displayDetector(); // Keeps the detector displayed as depending on the step size the detector can disappear when transversing within this function.
-    xCurrent = xCurrent + xMovement; // Updates the current x position value.
-    yCurrent = yCurrent + yMovement; // Updates the current y position value.
-    simulateTrack(energyCurrent, xCurrent, yCurrent); // Updates the alphas position.
-  }
-  redlaser.off(); // Turns off the laser as the pathing is now complete.
 }
 
 /* void displayDetector()
@@ -340,7 +231,4 @@ void simulateTrack(int energy, int xMiddlePoint, int yMiddlePoint) {
 void initiateLaserForDetectorDisplay() {
   redlaser.setScale(1); // Sets the scaling to be normal (no multiplication factor applied to the image) for the red laser.
   redlaser.setOffset(2048, 2048); // Sets the offset for the laser so the circles center corresponds to (0,0) for the red laser.
-
-  //greenlaser.setScale(1); // Sets the scaling to be normal (no multiplication factor applied to the image) for the green laser.
-  //greenlaser.setOffset(2048,2048); // Sets the offset for the laser so the circles center corresponds to (0,0) for the green laser.
 }

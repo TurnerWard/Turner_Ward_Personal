@@ -7,8 +7,8 @@ Arduino code to control a DAC that controls the galvo system motors to display t
 
 |**Name and Arguments**     |**Description**                                           |
 |-------------|------------------------------------------------------------------------|
-|setup()      |Initiates all the pins and functions needed to control the DAC and laser|
-|loop()       |Runs repeatedly and controls the main flow of the program               |
+|setup()      |Initiates all the pins and functions needed to control the DAC and laser.|
+|loop()       |Runs repeatedly and controls the main flow of the program.               |
 
 ### NEWS-G Additional Structs
 
