@@ -17,19 +17,21 @@ typedef struct CosmicRay {
 CosmicRay cosmicray1;
 
 int xMPPFQ1Muon[1][11] {
-  {320, 70, -190, -464, -720, -940, -1170, -1366, -1596, -1790, -2010}
+  {320, 70, -190, -464, -720, -940, -1170, -1366, -1596, -1790, -2010}, // 11
+  //{240, 206, 120, 60, -1, -60, -130, -203, -260, -323, -380, -423, -464, -513, -560, -603, -640, -690, -720, -770, -807, -850, -890} // 23
 };
 
 int yMPPFQ1Muon[1][11] {
-  {1980, 1740, 1500, 1283, 1060, 870, 665, 480, 284, 106, -70}
+  {1980, 1740, 1500, 1283, 1060, 870, 665, 480, 284, 106, -70}, // 11
+  //{2020, 1790, 1474, 1174, 895, 680, 494, 310, 106, -50, -220, -360, -500, -660, -835, -1010, -1163, -1305, -1440, -1580, -1670, -1765, -1840} //23
 };
 
 /* bool checkCosmicElectronDist()
 
     Returns false if the electrons have a distance greater then the specified distance away from the center of the detector. If all the electrons are within the specified distance
     from the center of the detector return true.
-  
- */
+
+*/
 bool checkCosmicElectronDist() {
   for (int loc = 0; loc < numElectronLocationsInArray; loc++) {
     if (cosmicElectrons[loc].rLocation > 20) {
@@ -52,34 +54,30 @@ CosmicRay createNewCosmicRay() {
 
   CosmicRay newCosmicRay;
 
-    if (halfNumber ==  1) {
-      newCosmicRay = {{
-          xMPPFQ1Muon[pathNumber][0], xMPPFQ1Muon[pathNumber][1], xMPPFQ1Muon[pathNumber][2], xMPPFQ1Muon[pathNumber][3], xMPPFQ1Muon[pathNumber][4], xMPPFQ1Muon[pathNumber][5],
-          xMPPFQ1Muon[pathNumber][6], xMPPFQ1Muon[pathNumber][7], xMPPFQ1Muon[pathNumber][8], xMPPFQ1Muon[pathNumber][9], xMPPFQ1Muon[pathNumber][10]
-        },
-        { yMPPFQ1Muon[pathNumber][0], yMPPFQ1Muon[pathNumber][1], yMPPFQ1Muon[pathNumber][2], yMPPFQ1Muon[pathNumber][3], yMPPFQ1Muon[pathNumber][4], yMPPFQ1Muon[pathNumber][5],
-          yMPPFQ1Muon[pathNumber][6], yMPPFQ1Muon[pathNumber][7], yMPPFQ1Muon[pathNumber][8], yMPPFQ1Muon[pathNumber][9], yMPPFQ1Muon[pathNumber][10]
-        },
-        cosmicrayEnergy, arrayStartLocation
-      }; // Creates the new cosmic ray with the new values.
+  //Serial.println(sizeof (xMPPFQ1Muon[0]) / sizeof (xMPPFQ1Muon[0][0]));
+
+  if (halfNumber ==  1) {
+    for (int loc = 0; loc < 11; loc++) {
+      newCosmicRay.xMovementPath[loc] = xMPPFQ1Muon[pathNumber][loc]; // Fills the movement arrays.
+      newCosmicRay.yMovementPath[loc] = yMPPFQ1Muon[pathNumber][loc];
     }
-    else if (halfNumber ==  2) {
-      newCosmicRay = {{
-          -1 * xMPPFQ1Muon[pathNumber][0], -1 * xMPPFQ1Muon[pathNumber][1], -1 * xMPPFQ1Muon[pathNumber][2], -1 * xMPPFQ1Muon[pathNumber][3], -1 * xMPPFQ1Muon[pathNumber][4],
-          -1 * xMPPFQ1Muon[pathNumber][5], -1 * xMPPFQ1Muon[pathNumber][6], -1 * xMPPFQ1Muon[pathNumber][7], -1 * xMPPFQ1Muon[pathNumber][8], -1 * xMPPFQ1Muon[pathNumber][9],
-          -1 * xMPPFQ1Muon[pathNumber][10]
-        }, {
-          yMPPFQ1Muon[pathNumber][0], yMPPFQ1Muon[pathNumber][1], yMPPFQ1Muon[pathNumber][2], yMPPFQ1Muon[pathNumber][3], yMPPFQ1Muon[pathNumber][4], yMPPFQ1Muon[pathNumber][5],
-          yMPPFQ1Muon[pathNumber][6], yMPPFQ1Muon[pathNumber][7], yMPPFQ1Muon[pathNumber][8], yMPPFQ1Muon[pathNumber][9], yMPPFQ1Muon[pathNumber][10]
-        }, cosmicrayEnergy, arrayStartLocation
-      }; // Creates the new cosmic ray with the new values.
+    newCosmicRay.energy = cosmicrayEnergy;
+    newCosmicRay.movementLocation = 0; // Creates the new cosmic ray with the new values.
+  }
+  else if (halfNumber ==  2) {
+    for (int loc = 0; loc < 11; loc++) {
+      newCosmicRay.xMovementPath[loc] = -1 * xMPPFQ1Muon[pathNumber][loc]; // Fills the movement arrays.
+      newCosmicRay.yMovementPath[loc] = yMPPFQ1Muon[pathNumber][loc];
+    }
+    newCosmicRay.energy = cosmicrayEnergy;
+    newCosmicRay.movementLocation = 0; // Creates the new cosmic ray with the new values.
   }
   return newCosmicRay; // Returns this new cosmic ray.
 }
 
 CosmicRay computeNextCosmicRayLocation(CosmicRay cosmicray) {
-  int energyChangeLowerBounds = 300; 
-  int energyChangeUpperBounds = 400; 
+  int energyChangeLowerBounds = 300;
+  int energyChangeUpperBounds = 400;
 
   randomSeed(0); // Randomizes the seed.
 
@@ -89,11 +87,11 @@ CosmicRay computeNextCosmicRayLocation(CosmicRay cosmicray) {
 
   if (cosmicray.movementLocation < 11) { // If the cosmic ray can exist.
     int energyChange = random(energyChangeLowerBounds, energyChangeUpperBounds); // Calculates the energy change that the electron will gain if created in keV.
-    if (cosmicray.movementLocation%2 == 0) { // Results in the stated percent chance to generate an electron with each step.
+    if (cosmicray.movementLocation % 2 == 0) { // Results in the stated percent chance to generate an electron with each step.
       cosmicElectrons[cosmicrayElectronLocation] = generateElectron(xCurrent, yCurrent, energyChange); // Generates an electron and saves it.
       energyCurrent = energyCurrent - energyChange; // Lowers the energy of the cosmic ray.
       cosmicrayElectronLocation++; // Increases the count for which the next electron will be added into the array.
-      
+
       if (cosmicrayElectronLocation == numElectronLocationsInArray) { // If the array is filled rotate around and start filling it again.
         cosmicrayElectronLocation = 0; // Resets the array position counter to 0.
       }
@@ -113,8 +111,8 @@ CosmicRay computeNextCosmicRayLocation(CosmicRay cosmicray) {
   else { // If the cosmic ray has left the detector or has no more energy...
     cosmicrayDone = true;
     CosmicRay newCosmicRay = createNewCosmicRay(); // Create a new cosmic ray.
-    
-    while (checkCosmicElectronDist() == false){
+
+    while (checkCosmicElectronDist() == false) {
       displayDetector();
       for (int loc = 0; loc < numElectronLocationsInArray; loc++) // For every position in the array...
         cosmicElectrons[loc] = computeNextElectronLocation(cosmicElectrons[loc]); // Computes and moves the electon through its current step.
