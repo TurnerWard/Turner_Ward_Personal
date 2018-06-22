@@ -19,7 +19,7 @@ typedef struct Alpha {
 } Alpha;
 
 Alpha po210alpha1;
-Alpha rn222alpha1;
+Alpha rn222alpha1; 
 
 // An array containing 6 different movement possibilities for quadrant 1 in the x direction for the alpha particles produced from Po210.
 int xMPPFQ1Po210[6][11] = {
