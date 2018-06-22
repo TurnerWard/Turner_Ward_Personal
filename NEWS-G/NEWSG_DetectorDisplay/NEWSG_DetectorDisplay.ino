@@ -14,8 +14,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int Po210AlphaButtonPin = 3;
 int Rn222AlphaButtonPin = 4;
+int Po210AlphaButtonPin = 3;
 int CosmicRayButtonPin = 6;
 
 void setup() {
@@ -28,7 +28,7 @@ void setup() {
 
   po210alpha1 = createNewPo210Alpha(); // Initiates the particles.
   rn222alpha1 = createNewRn222Alpha();
-  //xray1 = createNewXRay();
+  xray1 = createNewXRay();
   cosmicray1 = createNewCosmicRay();
 }
 
@@ -68,4 +68,12 @@ void detectorBrain () {
   else if (cosmicrayDone == true and digitalRead(CosmicRayButtonPin) == HIGH) { // If the cosmic ray is done and a reasonable amount of time has passed.
     cosmicrayDone = false; // Allow for the cosmic ray to be displayed once again.
   }
+
+//  if (xrayDone == false) { // If the xray has not completed its path...
+//    xray1 = computeNextXRayLocation(xray1); // Updates the xrays next locations.
+//  }
+//  else if (xrayDone == true and (currentMillis > lastXRayEvent + nextXRayEvent)) { // If the xray is done and a reasonable amount of time has passed.
+//    xrayDone = false; // Allow for the xray to be displayed once again.
+//  }
+//
 }

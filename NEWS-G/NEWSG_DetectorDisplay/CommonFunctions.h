@@ -8,8 +8,7 @@
 Laser redlaser(5); // Initiates a red laser in the 5th arduino pin.
 
 bool Po210AlphaDone = true, Rn222AlphaDone = true, cosmicrayDone = true, xrayDone = false;
-int numAlphaElectronLocationsInArray = 11; // The number of electrons that can be tracked. 6 seems to be a reasonable value but can be increased if more then two alphas are wanted.
-int numCosmicElectronLocationsInArray = 6;
+int numElectronLocationsInArray = 11; // The number of electrons that can be tracked. 6 seems to be a reasonable value but can be increased if more then two alphas are wanted.
 int alphaElectronLocation = 0, cosmicrayElectronLocation = 0; // The current location for which an electron should be added in.
 
 /* void simulateTrack(int energy, int xMiddlePoint, int yMiddlePoint)
