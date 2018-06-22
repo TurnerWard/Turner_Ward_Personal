@@ -21,9 +21,9 @@ Electron generateElectron(int xLocation, int yLocation, int energyDeposited) {
   if (yLocation >= 0) // If in the upper two quadrants.
     newElectron = {int(sqrt(pow(xLocation, 2) + pow(yLocation, 2))), int(round( atan2 (yLocation, xLocation) * 180 / 3.14159265 )), energyDeposited}; // Can compute normally.
   else if (xLocation <= 0 && yLocation <= 0) // If in the bottom left quadrant.
-    newElectron = {int(sqrt(pow(xLocation, 2) + pow(yLocation, 2))), int(180 + round( atan2 (abs(yLocation), abs(xLocation)) * 180 / 3.14159265 )), energyDeposited}; // Need to change computation.
+    newElectron = {int(sqrt(pow(xLocation, 2) + pow(yLocation, 2))), int(180 + round( atan2 (abs(yLocation), abs(xLocation)) * 180 / 3.14159265 )), energyDeposited};
   else // Otherwise in the bottom right quadrant.
-    newElectron = {int(sqrt(pow(xLocation, 2) + pow(yLocation, 2))), int(180 + round( atan2 (-1 * yLocation, -1 * xLocation) * 180 / 3.14159265 )), energyDeposited}; // Need to change computation.
+    newElectron = {int(sqrt(pow(xLocation, 2) + pow(yLocation, 2))), int(180 + round( atan2 (-1 * yLocation, -1 * xLocation) * 180 / 3.14159265 )), energyDeposited};
 
   return newElectron; // Returns the electron struct.
 }
@@ -34,7 +34,7 @@ Electron generateElectron(int xLocation, int yLocation, int energyDeposited) {
 
 */
 Electron computeNextElectronLocation(Electron electron) {
-  int rStrongElectricField = 100; // The radius for which the electrons get pulled directly into the center of the detector. Default is 100.
+  int rStrongElectricField = 800; // The radius for which the electrons get pulled directly into the center of the detector. Default is 100.
   int rMovementLowerBounds = 20; // The smallest step an electron can move after appearing. Default is 10.
   int rMovementUpperBounds = 40; // The largest step an electron can move after appearing. Default is 50.
   int thetaMovementBounds = 5; // The maximum angle in degrees for which the electron can move in one step. Default is 5.
@@ -63,7 +63,7 @@ Electron computeNextElectronLocation(Electron electron) {
       return newElectron; // Returns this new electron.
     }
     else if (rCurrent <= rStrongElectricField && 0 < rCurrent && energyCurrent > 0) { // While the electron is within the strong electric field range and has energy.
-      int rMovement = random(rMovementLowerBounds, rMovementUpperBounds); // Generates a random value between the declared values for the r change.
+      int rMovement = random(rMovementLowerBounds, rMovementUpperBounds)*3; // Generates a random value between the declared values for the r change.
       int energyChange = random(energyChangeLowerBounds, energyChangeUpperBounds); // Generates a random value between the declared values for the energy change.
       rCurrent = rCurrent - rMovement; // Updates the current radius value.
       energyCurrent = energyCurrent - energyChange; // Updates the current energy value.

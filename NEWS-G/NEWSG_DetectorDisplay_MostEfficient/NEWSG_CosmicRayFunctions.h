@@ -1,101 +1,123 @@
-
 #ifndef NEWSG_COSMICRAYFUNCTIONS_H
 #define NEWSG_COSMICRAYFUNCTIONS_H
 
 #include "NEWSG_CommonFunctions.h"
 #include "NEWSG_ElectronFunctions.h"
 
-Electron cosmicElectrons[6]; // Creates an array of 6 electrons. The value within the array needs to be equal to that of the numElectronLocationInArray variable.
+Electron cosmicElectrons[11]; // Creates an array of 6 electrons. The value within the array needs to be equal to that of the numElectronLocationInArray variable.
 
-// Creates an CosmicRay struct. A Cosmic Ray is made up of a x location, a y location, an energy, and a constant value for the movement in both the x direction and y direction.
+// Creates an CosmicRay struct. A Cosmic Ray is made up of a x movement path, a y movement path, an energy, and a location marker for the location within the path.
 typedef struct CosmicRay {
-  int xLocation;
-  int yLocation;
+  int xMovementPath[11];
+  int yMovementPath[11];
   int energy;
-  int xMovement;
-  int yMovement;
+  int movementLocation;
 } CosmicRay;
 
 CosmicRay cosmicray1;
 
-CosmicRay createNewCosmicRay() {
-  int rStartLowerBounds = 2000; // The minimum radius value for which a cosmic ray can be generated. Default is 2000.
-  int rStartUpperBounds = 2048; // The maximum radius value for which a cosmic raycan be generated. Default is 2048.
-  int energyLowerBounds = 200; // The minimum energy for which a cosmic ray can be generated in keV. Default is 150.
-  int energyUpperBounds = 250; // The maximum energy for which a cosmic ray can be generated in keV. Default is 250.
-  int movementBounds = 50; // The largest step a cosmic ray can move after appearing. Default is 25.
-  int lowestSpeed = 50; // The lowest speed at which a cosmic ray can travel. Default is 20.
+int xMPPFQ1Muon[1][11] {
+  {320, 70, -190, -464, -720, -940, -1170, -1366, -1596, -1790, -2010}
+};
 
+int yMPPFQ1Muon[1][11] {
+  {1980, 1740, 1500, 1283, 1060, 870, 665, 480, 284, 106, -70}
+};
+
+/* bool checkCosmicElectronDist()
+
+    Returns false if the electrons have a distance greater then the specified distance away from the center of the detector. If all the electrons are within the specified distance
+    from the center of the detector return true.
+  
+ */
+bool checkCosmicElectronDist() {
+  for (int loc = 0; loc < numElectronLocationsInArray; loc++) {
+    if (cosmicElectrons[loc].rLocation > 20) {
+      return false;
+    }
+  }
+  return true;
+}
+
+CosmicRay createNewCosmicRay() {
   const int maxSINCOSvalue = 16384; // The largest value that can be returned from the SIN and COS functions as declared in Basics.cpp. This should remain 16384.
 
   randomSeed(0); // Randomizes the seed. This in theory adds another layer of random to the code.
+  int pathNumber = 0; //random(0, 6); // Picks a random number from 0 to 5.
+  int halfNumber = random(1, 3); // Picks a random number between 1 and 2 for the half of the detector that is displayed.
+  int cosmicrayEnergy = 5300; // Should be 5300. In keV.
+  int arrayStartLocation = 0;
 
-  int rCurrent = random(rStartLowerBounds, rStartUpperBounds); // Randomly returns the radius value for the cosmic ray to start at between 1028 and 2048.
-  int thetaCurrent = random(0, 360); // Randomly returns the theta value for the cosmic ray to start at.
-  int xCurrent = rCurrent * COS(thetaCurrent) / maxSINCOSvalue; // Converts from polar to cartesian where the movement of cosmic ray particles are more easily replicated.
-  int yCurrent = rCurrent * SIN(thetaCurrent) / maxSINCOSvalue; // Converts from polar to cartesian where the movement of cosmic ray particles are more easily replicated.
-  int energyCurrent = random(energyLowerBounds, energyUpperBounds); // Generates the starting energy value of the alpha.
-  int xMovement = random(-movementBounds, movementBounds); // Determines the initial values for the x and y movement.
-  int yMovement = random(-movementBounds, movementBounds);
+  Serial.print("Cosmic Ray: "); Serial.print(pathNumber); Serial.print("\t"); Serial.println(halfNumber);
 
-  while (sqrt(pow(xMovement, 2) + pow(yMovement, 2)) < lowestSpeed) { // Computes the speed of the cosmic ray from the velocity vectors. This speed must be faster then the minumum.
-    xMovement = random(-movementBounds, movementBounds); // Generates a random value for x between the bounds.
-    yMovement = random(-movementBounds, movementBounds); // Generates a random value for y between the bounds.
+  CosmicRay newCosmicRay;
+
+    if (halfNumber ==  1) {
+      newCosmicRay = {{
+          xMPPFQ1Muon[pathNumber][0], xMPPFQ1Muon[pathNumber][1], xMPPFQ1Muon[pathNumber][2], xMPPFQ1Muon[pathNumber][3], xMPPFQ1Muon[pathNumber][4], xMPPFQ1Muon[pathNumber][5],
+          xMPPFQ1Muon[pathNumber][6], xMPPFQ1Muon[pathNumber][7], xMPPFQ1Muon[pathNumber][8], xMPPFQ1Muon[pathNumber][9], xMPPFQ1Muon[pathNumber][10]
+        },
+        { yMPPFQ1Muon[pathNumber][0], yMPPFQ1Muon[pathNumber][1], yMPPFQ1Muon[pathNumber][2], yMPPFQ1Muon[pathNumber][3], yMPPFQ1Muon[pathNumber][4], yMPPFQ1Muon[pathNumber][5],
+          yMPPFQ1Muon[pathNumber][6], yMPPFQ1Muon[pathNumber][7], yMPPFQ1Muon[pathNumber][8], yMPPFQ1Muon[pathNumber][9], yMPPFQ1Muon[pathNumber][10]
+        },
+        cosmicrayEnergy, arrayStartLocation
+      }; // Creates the new cosmic ray with the new values.
+    }
+    else if (halfNumber ==  2) {
+      newCosmicRay = {{
+          -1 * xMPPFQ1Muon[pathNumber][0], -1 * xMPPFQ1Muon[pathNumber][1], -1 * xMPPFQ1Muon[pathNumber][2], -1 * xMPPFQ1Muon[pathNumber][3], -1 * xMPPFQ1Muon[pathNumber][4],
+          -1 * xMPPFQ1Muon[pathNumber][5], -1 * xMPPFQ1Muon[pathNumber][6], -1 * xMPPFQ1Muon[pathNumber][7], -1 * xMPPFQ1Muon[pathNumber][8], -1 * xMPPFQ1Muon[pathNumber][9],
+          -1 * xMPPFQ1Muon[pathNumber][10]
+        }, {
+          yMPPFQ1Muon[pathNumber][0], yMPPFQ1Muon[pathNumber][1], yMPPFQ1Muon[pathNumber][2], yMPPFQ1Muon[pathNumber][3], yMPPFQ1Muon[pathNumber][4], yMPPFQ1Muon[pathNumber][5],
+          yMPPFQ1Muon[pathNumber][6], yMPPFQ1Muon[pathNumber][7], yMPPFQ1Muon[pathNumber][8], yMPPFQ1Muon[pathNumber][9], yMPPFQ1Muon[pathNumber][10]
+        }, cosmicrayEnergy, arrayStartLocation
+      }; // Creates the new cosmic ray with the new values.
   }
-
-  CosmicRay newCosmicRay = {xCurrent, yCurrent, energyCurrent, xMovement, yMovement}; // Creates the new cosmic ray with the new values.
   return newCosmicRay; // Returns this new cosmic ray.
 }
 
 CosmicRay computeNextCosmicRayLocation(CosmicRay cosmicray) {
-  const int maximumRadius = 2000; // Defines the maxmimum radius value an alpha can reach before it gets obliterated. Default is 2000.
-  int energyChangeLowerBounds = 30; // The smallest energy value the cosmic ray can "lose" in one step to an electron. Default is 60 keV.
-  int energyChangeUpperBounds = 60; // The largest energy value the cosmic ray can "lose" in one step to an electron. Default is 100 keV.
-  int cosmicrayEnergyChangeDivider = 40; // The divider that controls the ratio of energy for which the cosmic ray loses in one step. Default is 4.
-  int percentLikelihoodForElectron = 5; // The percent likelihood for an electron to be producted in each movement of the cosmic ray.
+  int energyChangeLowerBounds = 300; 
+  int energyChangeUpperBounds = 400; 
 
   randomSeed(0); // Randomizes the seed.
 
-  int xCurrent = cosmicray.xLocation + cosmicray.xMovement; // Saves the passed in xLocation, yLocation, and energy values.
-  int yCurrent = cosmicray.yLocation + cosmicray.yMovement;
+  int xCurrent = cosmicray.xMovementPath[cosmicray.movementLocation]; // Saves the passed in xLocation, yLocation, and energy values.
+  int yCurrent = cosmicray.yMovementPath[cosmicray.movementLocation];
   int energyCurrent = cosmicray.energy;
 
-  if (sqrt(pow(xCurrent, 2) + pow(yCurrent, 2)) < maximumRadius && energyCurrent > 0) { // If the cosmic ray can exist.
+  if (cosmicray.movementLocation < 11) { // If the cosmic ray can exist.
     int energyChange = random(energyChangeLowerBounds, energyChangeUpperBounds); // Calculates the energy change that the electron will gain if created in keV.
-    if (random(0, 101) > (100 - percentLikelihoodForElectron)) { // Results in the stated percent chance to generate an electron with each step.
+    if (cosmicray.movementLocation%2 == 0) { // Results in the stated percent chance to generate an electron with each step.
       cosmicElectrons[cosmicrayElectronLocation] = generateElectron(xCurrent, yCurrent, energyChange); // Generates an electron and saves it.
-      energyCurrent = energyCurrent - energyChange / cosmicrayEnergyChangeDivider; // Lowers the energy of the cosmic ray.
+      energyCurrent = energyCurrent - energyChange; // Lowers the energy of the cosmic ray.
       cosmicrayElectronLocation++; // Increases the count for which the next electron will be added into the array.
+      
       if (cosmicrayElectronLocation == numElectronLocationsInArray) { // If the array is filled rotate around and start filling it again.
         cosmicrayElectronLocation = 0; // Resets the array position counter to 0.
       }
     }
     else {
-      energyCurrent = energyCurrent - energyChange / cosmicrayEnergyChangeDivider;
+      energyCurrent = energyCurrent - energyChange;
     }
 
-    for (int loc = 0; loc < numElectronLocationsInArray; loc++) { // For every position in the array...
+    for (int loc = 0; loc < numElectronLocationsInArray; loc++) // For every position in the array...
       cosmicElectrons[loc] = computeNextElectronLocation(cosmicElectrons[loc]); // Computes and moves the electon through its current step.
-    }
 
-    simulateTrack(energyCurrent, xCurrent, yCurrent); // Updates the alphas position.
-    CosmicRay newCosmicRay = {xCurrent, yCurrent, energyCurrent, cosmicray.xMovement}; // Creates the new cosmic ray with the new values.
-    return newCosmicRay; // Returns this new cosmic ray.
+    simulateTrack(energyCurrent, xCurrent, yCurrent); // Updates the cosmic rays position.
+    cosmicray.energy = energyCurrent;
+    cosmicray.movementLocation = cosmicray.movementLocation + 1; // Creates the new alpha with the new values.
+    return cosmicray; // Returns this new cosmic ray.
   }
   else { // If the cosmic ray has left the detector or has no more energy...
     cosmicrayDone = true;
-    lastCosmicRayEvent = millis();
-    nextCosmicRayEvent = random(500, 2000);
     CosmicRay newCosmicRay = createNewCosmicRay(); // Create a new cosmic ray.
-
-    while (cosmicElectrons[0].rLocation >= 20 or cosmicElectrons[1].rLocation >= 20 or cosmicElectrons[2].rLocation >= 20 or cosmicElectrons[3].rLocation >= 20  \
-           or cosmicElectrons[4].rLocation >= 20 or cosmicElectrons[5].rLocation >= 20) {
+    
+    while (checkCosmicElectronDist() == false){
       displayDetector();
-      if (cosmicrayDone == false)
-        cosmicray1 = computeNextCosmicRayLocation(cosmicray1);
-      for (int loc = 0; loc < numElectronLocationsInArray; loc++) { // For every position in the array...
+      for (int loc = 0; loc < numElectronLocationsInArray; loc++) // For every position in the array...
         cosmicElectrons[loc] = computeNextElectronLocation(cosmicElectrons[loc]); // Computes and moves the electon through its current step.
-      }
     }
     return newCosmicRay; // Returns the new alpha so that the infinite loop can be continued.
   }

@@ -70,8 +70,6 @@ XRay computeNextXRayLocation(XRay xray) {
   }
   else {
     xrayDone = true;
-    lastXRayEvent = millis();
-    nextXRayEvent = random(500, 2000);
     XRay newXRay = createNewXRay(); // Creates a new XRay.
     return newXRay;
   }

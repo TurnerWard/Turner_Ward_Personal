@@ -7,9 +7,8 @@
 
 Laser redlaser(5); // Initiates a red laser in the 5th arduino pin.
 
-bool alphaDone = false, xrayDone = false, cosmicrayDone = false;
-unsigned long currentMillis, lastAlphaEvent, nextAlphaEvent, lastXRayEvent, nextXRayEvent, lastCosmicRayEvent, nextCosmicRayEvent;
-int numElectronLocationsInArray = 10; // The number of electrons that can be tracked. 6 seems to be a reasonable value but can be increased if more then two alphas are wanted.
+bool Po210AlphaDone = true, Rn222AlphaDone = true, cosmicrayDone = true, xrayDone = false;
+int numElectronLocationsInArray = 11; // The number of electrons that can be tracked. 6 seems to be a reasonable value but can be increased if more then two alphas are wanted.
 int alphaElectronLocation = 0, cosmicrayElectronLocation = 0; // The current location for which an electron should be added in.
 
 /* void simulateTrack(int energy, int xMiddlePoint, int yMiddlePoint)
@@ -18,6 +17,9 @@ int alphaElectronLocation = 0, cosmicrayElectronLocation = 0; // The current loc
 
 */
 void simulateTrack(int energy, int xMiddlePoint, int yMiddlePoint) {
+  int energyScalingFactor = 10;
+  energy = energy/energyScalingFactor;
+  redlaser.off();
   redlaser.sendto(SIN(0)*energy / 16384 + xMiddlePoint, COS(0)*energy / 16384 + yMiddlePoint); // Moves the laser to the first location of the disk.
   redlaser.on(); // Turns the laser on.
   for (int loc = 0; loc <= 360; loc += 60) { // Flips through the circle degrees in steps of 60.
