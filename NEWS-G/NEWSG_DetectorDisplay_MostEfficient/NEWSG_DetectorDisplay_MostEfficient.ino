@@ -14,8 +14,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int Rn222AlphaButtonPin = 4;
 int Po210AlphaButtonPin = 3;
+int Rn222AlphaButtonPin = 4;
 int CosmicRayButtonPin = 6;
 
 void setup() {
