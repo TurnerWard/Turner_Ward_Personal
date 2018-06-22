@@ -1,4 +1,5 @@
 
+#ifndef ALPHAFUNCTIONS_H
 #define ALPHAFUNCTIONS_H
 
 #include "CommonFunctions.h"
@@ -67,7 +68,7 @@ int yMPPFQ1Rn222[6][11] = {
 
 */
 bool checkAlphaElectronDist() {
-  for (int loc = 0; loc < numAlphaElectronLocationsInArray; loc++) {
+  for (int loc = 0; loc < numElectronLocationsInArray; loc++) {
     if (alphaElectrons[loc].rLocation > 20) {
       return false;
     }
@@ -96,51 +97,36 @@ Alpha createNewPo210Alpha() {
 
   for (int loc = 0; loc < 11; loc++) {
     if (quadrantNumber ==  1) {
-      newPo210Alpha = {{
-          xMPPFQ1Po210[pathNumber][0], xMPPFQ1Po210[pathNumber][1], xMPPFQ1Po210[pathNumber][2], xMPPFQ1Po210[pathNumber][3], xMPPFQ1Po210[pathNumber][4], xMPPFQ1Po210[pathNumber][5],
-          xMPPFQ1Po210[pathNumber][6], xMPPFQ1Po210[pathNumber][7], xMPPFQ1Po210[pathNumber][8], xMPPFQ1Po210[pathNumber][9], xMPPFQ1Po210[pathNumber][10]
-        },
-        { yMPPFQ1Po210[pathNumber][0], yMPPFQ1Po210[pathNumber][1], yMPPFQ1Po210[pathNumber][2], yMPPFQ1Po210[pathNumber][3], yMPPFQ1Po210[pathNumber][4], yMPPFQ1Po210[pathNumber][5],
-          yMPPFQ1Po210[pathNumber][6], yMPPFQ1Po210[pathNumber][7], yMPPFQ1Po210[pathNumber][8], yMPPFQ1Po210[pathNumber][9], yMPPFQ1Po210[pathNumber][10]
-        },
-        Po210alphaEnergy, arrayStartLocation
-      }; // Creates the new Po 210 alpha with the new values.
+      for (int loc = 0; loc < 11; loc++) {
+        newPo210Alpha.xMovementPath[loc] = xMPPFQ1Po210[pathNumber][loc]; // Fills the movement arrays.
+        newPo210Alpha.yMovementPath[loc] = yMPPFQ1Po210[pathNumber][loc];
+      }
+      newPo210Alpha.energy = Po210alphaEnergy;
+      newPo210Alpha.movementLocation = 0; // Creates the new cosmic ray with the new values.
     }
     else if (quadrantNumber ==  2) {
-      newPo210Alpha = {{
-          -1 * xMPPFQ1Po210[pathNumber][0], -1 * xMPPFQ1Po210[pathNumber][1], -1 * xMPPFQ1Po210[pathNumber][2], -1 * xMPPFQ1Po210[pathNumber][3], -1 * xMPPFQ1Po210[pathNumber][4],
-          -1 * xMPPFQ1Po210[pathNumber][5], -1 * xMPPFQ1Po210[pathNumber][6], -1 * xMPPFQ1Po210[pathNumber][7], -1 * xMPPFQ1Po210[pathNumber][8], -1 * xMPPFQ1Po210[pathNumber][9],
-          -1 * xMPPFQ1Po210[pathNumber][10]
-        }, {
-          yMPPFQ1Po210[pathNumber][0], yMPPFQ1Po210[pathNumber][1], yMPPFQ1Po210[pathNumber][2], yMPPFQ1Po210[pathNumber][3], yMPPFQ1Po210[pathNumber][4], yMPPFQ1Po210[pathNumber][5],
-          yMPPFQ1Po210[pathNumber][6], yMPPFQ1Po210[pathNumber][7], yMPPFQ1Po210[pathNumber][8], yMPPFQ1Po210[pathNumber][9], yMPPFQ1Po210[pathNumber][10]
-        }, Po210alphaEnergy, arrayStartLocation
-      }; // Creates the new alpha with the new values.
+      for (int loc = 0; loc < 11; loc++) {
+        newPo210Alpha.xMovementPath[loc] = -1 * xMPPFQ1Po210[pathNumber][loc]; // Fills the movement arrays.
+        newPo210Alpha.yMovementPath[loc] = yMPPFQ1Po210[pathNumber][loc];
+      }
+      newPo210Alpha.energy = Po210alphaEnergy;
+      newPo210Alpha.movementLocation = 0; // Creates the new cosmic ray with the new values.
     }
     else if (quadrantNumber ==  3) {
-      newPo210Alpha = {{
-          -1 * xMPPFQ1Po210[pathNumber][0], -1 * xMPPFQ1Po210[pathNumber][1], -1 * xMPPFQ1Po210[pathNumber][2], -1 * xMPPFQ1Po210[pathNumber][3], -1 * xMPPFQ1Po210[pathNumber][4],
-          -1 * xMPPFQ1Po210[pathNumber][5], -1 * xMPPFQ1Po210[pathNumber][6], -1 * xMPPFQ1Po210[pathNumber][7], -1 * xMPPFQ1Po210[pathNumber][8], -1 * xMPPFQ1Po210[pathNumber][9],
-          -1 * xMPPFQ1Po210[pathNumber][10]
-        },
-        { -1 * yMPPFQ1Po210[pathNumber][0], -1 * yMPPFQ1Po210[pathNumber][1], -1 * yMPPFQ1Po210[pathNumber][2], -1 * yMPPFQ1Po210[pathNumber][3], -1 * yMPPFQ1Po210[pathNumber][4],
-          -1 * yMPPFQ1Po210[pathNumber][5], -1 * yMPPFQ1Po210[pathNumber][6], -1 * yMPPFQ1Po210[pathNumber][7], -1 * yMPPFQ1Po210[pathNumber][8], -1 * yMPPFQ1Po210[pathNumber][9],
-          -1 * yMPPFQ1Po210[pathNumber][10]
-        },
-        Po210alphaEnergy, arrayStartLocation
-      }; // Creates the new alpha with the new values.
+      for (int loc = 0; loc < 11; loc++) {
+        newPo210Alpha.xMovementPath[loc] = -1 * xMPPFQ1Po210[pathNumber][loc]; // Fills the movement arrays.
+        newPo210Alpha.yMovementPath[loc] = -1 * yMPPFQ1Po210[pathNumber][loc];
+      }
+      newPo210Alpha.energy = Po210alphaEnergy;
+      newPo210Alpha.movementLocation = 0; // Creates the new cosmic ray with the new values.
     }
     else if (quadrantNumber ==  4) {
-      newPo210Alpha = {{
-          xMPPFQ1Po210[pathNumber][0], xMPPFQ1Po210[pathNumber][1], xMPPFQ1Po210[pathNumber][2], xMPPFQ1Po210[pathNumber][3], xMPPFQ1Po210[pathNumber][4], xMPPFQ1Po210[pathNumber][5],
-          xMPPFQ1Po210[pathNumber][6], xMPPFQ1Po210[pathNumber][7], xMPPFQ1Po210[pathNumber][8], xMPPFQ1Po210[pathNumber][9], xMPPFQ1Po210[pathNumber][10]
-        },
-        { -1 * yMPPFQ1Po210[pathNumber][0], -1 * yMPPFQ1Po210[pathNumber][1], -1 * yMPPFQ1Po210[pathNumber][2], -1 * yMPPFQ1Po210[pathNumber][3], -1 * yMPPFQ1Po210[pathNumber][4],
-          -1 * yMPPFQ1Po210[pathNumber][5], -1 * yMPPFQ1Po210[pathNumber][6],  -1 * yMPPFQ1Po210[pathNumber][7], -1 * yMPPFQ1Po210[pathNumber][8], -1 * yMPPFQ1Po210[pathNumber][9],
-          -1 * yMPPFQ1Po210[pathNumber][10]
-        },
-        Po210alphaEnergy, arrayStartLocation
-      }; // Creates the new alpha with the new values.
+      for (int loc = 0; loc < 11; loc++) {
+        newPo210Alpha.xMovementPath[loc] = xMPPFQ1Po210[pathNumber][loc]; // Fills the movement arrays.
+        newPo210Alpha.yMovementPath[loc] = -1 * yMPPFQ1Po210[pathNumber][loc];
+      }
+      newPo210Alpha.energy = Po210alphaEnergy;
+      newPo210Alpha.movementLocation = 0; // Creates the new cosmic ray with the new values.
     }
   }
   return newPo210Alpha; // Returns this new alpha.
@@ -238,11 +224,11 @@ Alpha computeNextPo210AlphaLocation(Alpha Po210Alpha) {
     energyCurrent = energyCurrent - energyChange; // Lowers the energy of the alpha.
     alphaElectronLocation++; // Increases the count for which the next electron will be added into the array.
 
-    if (alphaElectronLocation == numAlphaElectronLocationsInArray) // If the array is filled rotate around and start filling it again.
+    if (alphaElectronLocation == numElectronLocationsInArray) // If the array is filled rotate around and start filling it again.
       alphaElectronLocation = 0; // Resets the array position counter to 0.
 
 
-    for (int loc = 0; loc < numAlphaElectronLocationsInArray; loc++)  // For every position in the array...
+    for (int loc = 0; loc < numElectronLocationsInArray; loc++)  // For every position in the array...
       alphaElectrons[loc] = computeNextElectronLocation(alphaElectrons[loc]); // Computes and moves the electon through its current step.
 
     simulateTrack(energyCurrent, xCurrent, yCurrent); // Updates the alphas position.
@@ -255,7 +241,7 @@ Alpha computeNextPo210AlphaLocation(Alpha Po210Alpha) {
     Alpha newPo210Alpha = createNewPo210Alpha(); // Create a new alpha.
     while (checkAlphaElectronDist() == false) {
       displayDetector();
-      for (int loc = 0; loc < numAlphaElectronLocationsInArray; loc++) // For every position in the array...
+      for (int loc = 0; loc < numElectronLocationsInArray; loc++) // For every position in the array...
         alphaElectrons[loc] = computeNextElectronLocation(alphaElectrons[loc]); // Computes and moves the electon through its current step.
     }
     return newPo210Alpha; // Returns the new alpha so that the infinite loop can be continued.
@@ -283,10 +269,10 @@ Alpha computeNextRn222AlphaLocation(Alpha Rn222Alpha) {
     energyCurrent = energyCurrent - energyChange; // Lowers the energy of the alpha.
     alphaElectronLocation++; // Increases the count for which the next electron will be added into the array.
 
-    if (alphaElectronLocation == numAlphaElectronLocationsInArray) // If the array is filled rotate around and start filling it again.
+    if (alphaElectronLocation == numElectronLocationsInArray) // If the array is filled rotate around and start filling it again.
       alphaElectronLocation = 0; // Resets the array position counter to 0.
 
-    for (int loc = 0; loc < numAlphaElectronLocationsInArray; loc++)  // For every position in the array...
+    for (int loc = 0; loc < numElectronLocationsInArray; loc++)  // For every position in the array...
       alphaElectrons[loc] = computeNextElectronLocation(alphaElectrons[loc]); // Computes and moves the electon through its current step.
 
     simulateTrack(energyCurrent, xCurrent, yCurrent); // Updates the alphas position.
@@ -300,7 +286,7 @@ Alpha computeNextRn222AlphaLocation(Alpha Rn222Alpha) {
 
     while (checkAlphaElectronDist() == false) {
       displayDetector();
-      for (int loc = 0; loc < numAlphaElectronLocationsInArray; loc++) // For every position in the array...
+      for (int loc = 0; loc < numElectronLocationsInArray; loc++) // For every position in the array...
         alphaElectrons[loc] = computeNextElectronLocation(alphaElectrons[loc]); // Computes and moves the electon through its current step.
     }
     return newRn222Alpha; // Returns the new alpha so that the infinite loop can be continued.
