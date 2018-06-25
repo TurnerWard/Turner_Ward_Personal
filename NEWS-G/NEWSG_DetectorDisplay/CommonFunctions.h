@@ -6,7 +6,7 @@
 
 // Variable declaration.
 Laser redlaser(5); // Initiates a red laser in the 5th arduino pin.
-bool Po210AlphaDone = true, Rn222AlphaDone = true, cosmicrayDone = true, xrayDone = true;
+bool Po210AlphaDone = true, Rn222AlphaDone = true, cosmicrayDone = true, pointlikeparticleDone = true;
 int numElectronLocationsInArray = 11; // The number of electrons that can be tracked.
 int alphaElectronLocation = 0, cosmicrayElectronLocation = 0; // The current location for which an electron should be added in.
 int numberOfParticleSteps = 11; // The number of electron steps that are contained within the particle.

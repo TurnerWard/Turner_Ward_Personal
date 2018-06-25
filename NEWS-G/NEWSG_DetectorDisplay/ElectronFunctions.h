@@ -34,9 +34,9 @@ Electron generateElectron(int xLocation, int yLocation, int energyDeposited) {
 
 */
 Electron computeNextElectronLocation(Electron electron) {
-  int rStrongElectricField = 800; // The radius for which the electrons get pulled directly into the center of the detector. Default is 100.
-  int rMovementLowerBounds = 20; // The smallest step an electron can move after appearing. Default is 10.
-  int rMovementUpperBounds = 40; // The largest step an electron can move after appearing. Default is 50.
+  int rStrongElectricField = 200; // The radius for which the electrons get pulled directly into the center of the detector. Default is 100.
+  int rMovementLowerBounds = 10; // The smallest step an electron can move after appearing. Default is 10.
+  int rMovementUpperBounds = 10; // The largest step an electron can move after appearing. Default is 50.
   int thetaMovementBounds = 5; // The maximum angle in degrees for which the electron can move in one step. Default is 5.
   int energyChangeLowerBounds = 0; // The minimum energy that an electron can lose in 1 interaction in keV. Default is 1.
   int energyChangeUpperBounds = 0; // The maximum energy that an electron can lose in 1 interaction in keV. Default is 5.
@@ -49,21 +49,25 @@ Electron computeNextElectronLocation(Electron electron) {
   int thetaCurrent = electron.thetaLocation;
   int energyCurrent = electron.energy;
 
+  Serial.println(rCurrent);
+  
   if (rCurrent > 0 && energyCurrent > 0) { // If the electron exists (ie. has a radius that is not at the center of the detector and has a positive energy).
     if (rCurrent > rStrongElectricField && energyCurrent > 0) { // While outside the inner radius where the electric field is weaker and the electron still has energy.
-      int rMovement = random(rMovementLowerBounds, rMovementUpperBounds); // Generates a random value between the declared values for the r change.
+      //int rMovement = random(rMovementLowerBounds, rMovementUpperBounds) + electron.speedMultiplier; // Generates a random value between the declared values for the r change.
+      int rMovement = -6+86/(1+pow(rCurrent/1014,2.14)); // The equation for which the speed that the electron will take follows.
       int thetaMovement = random(-thetaMovementBounds, thetaMovementBounds); // Generates a random value between the declared values for the theta change.
       int energyChange = random(energyChangeLowerBounds, energyChangeUpperBounds); // Generates a random value between the declared values for the energy change.
       rCurrent = rCurrent - rMovement; // Updates the current radius value.
       thetaCurrent = thetaCurrent + thetaMovement; // Updates the current theta value.
       energyCurrent = energyCurrent - energyChange; // Updates the current energy value.
 
-      simulateTrack(energyCurrent, rCurrent * COS(thetaCurrent) / maxSINCOSvalue, rCurrent * SIN(thetaCurrent) / maxSINCOSvalue); // Displays the electron.
+      simulateTrack(energyCurrent, rCurrent * COS(thetaCurrent) / maxSINCOSvalue, rCurrent * SIN(thetaCurrent) / maxSINCOSvalue);
       Electron newElectron = {rCurrent, thetaCurrent, energyCurrent}; // Creates the new elecron with the new values.
       return newElectron; // Returns this new electron.
     }
     else if (rCurrent <= rStrongElectricField && 0 < rCurrent && energyCurrent > 0) { // While the electron is within the strong electric field range and has energy.
-      int rMovement = random(rMovementLowerBounds, rMovementUpperBounds)*3; // Generates a random value between the declared values for the r change.
+      //int rMovement = random(rMovementLowerBounds, rMovementUpperBounds); // Generates a random value between the declared values for the r change.
+      int rMovement = -6+86/(1+pow(rCurrent/1014,2.14)); // The equation for which the speed that the electron will take follows.
       int energyChange = random(energyChangeLowerBounds, energyChangeUpperBounds); // Generates a random value between the declared values for the energy change.
       rCurrent = rCurrent - rMovement; // Updates the current radius value.
       energyCurrent = energyCurrent - energyChange; // Updates the current energy value.

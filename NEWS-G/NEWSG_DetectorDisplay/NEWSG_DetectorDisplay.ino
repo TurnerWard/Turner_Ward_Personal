@@ -12,12 +12,13 @@
 #include "CommonFunctions.h"
 #include "CosmicRayFunctions.h"
 #include "ElectronFunctions.h"
-#include "XRayFunctions.h"
+#include "PointLikeParticleFunctions.h"
 
 // Variable declaration.
 int Po210AlphaButtonPin = 3;
 int Rn222AlphaButtonPin = 4;
 int CosmicRayButtonPin = 6;
+int PointLikeParticleButtonPin = 8;
 
 // Setup.
 void setup() {
@@ -61,12 +62,12 @@ void detectorBrain () {
     cosmicrayDone = false; // Allow for the cosmic ray to be displayed once again.
   }
 
-//  if (xrayDone == false) { // If the xray has not completed its path...
-//    xray1 = computeNextCosmicRayLocation(xray1); // Updates the xray next locations.
-//  }
-//  else if (xrayDone == true and digitalRead(XRayButtonPin) == HIGH) { // If the xray is done and the button has been pushed.
-//    xrayDone = false; // Allow for the xray to be displayed once again.
-//  }
+  if (pointlikeparticleDone == false) { // If the xray has not completed its path...
+    pointlikeparticle1 = computeNextPointLikeParticleLocation(pointlikeparticle1); // Updates the xray next locations.
+  }
+  else if (pointlikeparticleDone == true and digitalRead(PointLikeParticleButtonPin) == HIGH) { // If the xray is done and the button has been pushed.
+    pointlikeparticleDone = false; // Allow for the xray to be displayed once again.
+  }
 }
 
 /* initiateDisplay()
@@ -78,7 +79,8 @@ void initiateDisplay() {
   Serial.begin(9600);
   pinMode(Po210AlphaButtonPin, INPUT);
   pinMode(Rn222AlphaButtonPin, INPUT);
-  pinMode(CosmicRayButtonPin, INPUT);
+ // pinMode(CosmicRayButtonPin, INPUT);
+  pinMode(PointLikeParticleButtonPin, INPUT);
 
   redlaser.init(); // Initiates the red laser which also initiates the dac.
   redlaser.setScale(1); // Sets the scaling to be normal (no multiplication factor applied to the image) for the red laser.
@@ -87,5 +89,5 @@ void initiateDisplay() {
   po210alpha1 = createNewPo210Alpha(); // Initiates the particles and creates new versions of each specific particle.
   rn222alpha1 = createNewRn222Alpha();
   cosmicray1 = createNewCosmicRay();
-  xray1 = createNewXRay();
+  pointlikeparticle1 = createNewPointLikeParticle();
 }

@@ -5,7 +5,7 @@
 #include "CommonFunctions.h"
 #include "CosmicRayFunctions.h"
 #include "ElectronFunctions.h"
-#include "XRayFunctions.h"
+#include "PointLikeParticleFunctions.h"
 
 // Variable declaration.
 Electron alphaElectrons[11]; // Creates an array of 11 electrons. The value within the array needs to be equal to that of the numElectronLocationInArray variable.
