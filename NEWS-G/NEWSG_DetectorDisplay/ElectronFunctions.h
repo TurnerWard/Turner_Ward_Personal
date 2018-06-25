@@ -19,7 +19,7 @@ typedef struct Electron {
 Electron generateElectron(int xLocation, int yLocation, int energyDeposited) {
   Electron newElectron; // Creates a new electron using the electron struct.
   if (yLocation >= 0) // If in the upper two quadrants.
-    newElectron = {int(sqrt(pow(xLocation, 2) + pow(yLocation, 2))), int(round( atan2 (yLocation, xLocation) * 180 / 3.14159265 )), energyDeposited}; // Can compute normally.
+    newElectron = {int(sqrt(pow(xLocation, 2) + pow(yLocation, 2))), int(round( atan2 (yLocation, xLocation) * 180 / 3.14159265 )), energyDeposited};
   else if (xLocation <= 0 && yLocation <= 0) // If in the bottom left quadrant.
     newElectron = {int(sqrt(pow(xLocation, 2) + pow(yLocation, 2))), int(180 + round( atan2 (abs(yLocation), abs(xLocation)) * 180 / 3.14159265 )), energyDeposited};
   else // Otherwise in the bottom right quadrant.

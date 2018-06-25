@@ -1,4 +1,3 @@
-
 #ifndef COMMONFUNCTIONS_H
 #define COMMONFUNCTIONS_H
 
@@ -8,8 +7,9 @@
 Laser redlaser(5); // Initiates a red laser in the 5th arduino pin.
 
 bool Po210AlphaDone = true, Rn222AlphaDone = true, cosmicrayDone = true, xrayDone = false;
-int numElectronLocationsInArray = 11; // The number of electrons that can be tracked. 6 seems to be a reasonable value but can be increased if more then two alphas are wanted.
+int numElectronLocationsInArray = 11; // The number of electrons that can be tracked. 
 int alphaElectronLocation = 0, cosmicrayElectronLocation = 0; // The current location for which an electron should be added in.
+int numberOfParticleSteps = 11; // The number of electron steps that are contained within the particle.
 
 /* void simulateTrack(int energy, int xMiddlePoint, int yMiddlePoint)
 
@@ -17,11 +17,11 @@ int alphaElectronLocation = 0, cosmicrayElectronLocation = 0; // The current loc
 
 */
 void simulateTrack(int energy, int xMiddlePoint, int yMiddlePoint) {
-  int energyScalingFactor = 10;
-  energy = energy/energyScalingFactor;
-  redlaser.off();
+  int energyScalingFactor = 10; // An energy scaling factor that allows for accurate energy values to be used but not be too large within the detector.
+  energy = energy/energyScalingFactor; // Updates the energy value with the scaling factor above.
+  redlaser.off(); // Turns off the red laser.
   redlaser.sendto(SIN(0)*energy / 16384 + xMiddlePoint, COS(0)*energy / 16384 + yMiddlePoint); // Moves the laser to the first location of the disk.
-  redlaser.on(); // Turns the laser on.
+  redlaser.on(); // Turns the red laser on.
   for (int loc = 0; loc <= 360; loc += 60) { // Flips through the circle degrees in steps of 60.
     redlaser.sendto(SIN(loc)*energy / 16384 + xMiddlePoint, COS(loc)*energy / 16384 + yMiddlePoint); // Moves the laser around the circle in steps of 60.
   }
@@ -45,22 +45,11 @@ void displayDetector() {
   {
     redlaser.sendto(SIN(loc) / smallestSINCOSvalue, COS(loc) / smallestSINCOSvalue); // Displays the circle.
   }
-
   redlaser.off(); // After we have displayed the laser we can turn off the laser.
   redlaser.sendto(0, -2048); // Moves to the bottom portion of the rod.
   redlaser.on();  // Turns on the laser.
   redlaser.sendto(0, 0); // Moves to the center of the circle.
   redlaser.off(); // Turns the laser off.
-}
-
-/* initiateLaserForDetectorDisplay()
-
-   Initiates all the laser settings needed for scalled and offsets.
-
-*/
-void initiateLaserForDetectorDisplay() {
-  redlaser.setScale(1); // Sets the scaling to be normal (no multiplication factor applied to the image) for the red laser.
-  redlaser.setOffset(2048, 2048); // Sets the offset for the laser so the circles center corresponds to (0,0) for the red laser.
 }
 
 #endif

@@ -1,4 +1,3 @@
-
 #ifndef ALPHAFUNCTIONS_H
 #define ALPHAFUNCTIONS_H
 
@@ -7,10 +6,11 @@
 #include "ElectronFunctions.h"
 #include "XRayFunctions.h"
 
-Electron alphaElectrons[11]; // Creates an array of 6 electrons. The value within the array needs to be equal to that of the numElectronLocationInArray variable.
+Electron Po210AlphaElectrons[11]; // Creates an array of 11 Po210 electrons. The value within the array needs to be equal to that of the numElectronLocationInArray variable.
+Electron Rn222AlphaElectrons[11]; // Creates an array of 11 Rn222 electrons. The value within the array needs to be equal to that of the numElectronLocationInArray variable.
 
-// Creates an Alpha struct. An alpha is made up of a x location, a y location, an energy, and a constant value for the movement in both the x direction and y direction as well as
-// a total distance it can travel and a varible to track its distance.
+// Creates an Alpha struct. An alpha is made up of two array, one for the x movement locations and one for the y movement locations, an energy value, and a movement location
+// variable to keep track of the current location at which the particle is at in the movement arrays.
 typedef struct Alpha {
   int xMovementPath[11];
   int yMovementPath[11];
@@ -18,8 +18,8 @@ typedef struct Alpha {
   int movementLocation;
 } Alpha;
 
-Alpha po210alpha1;
-Alpha rn222alpha1; 
+Alpha po210alpha1; // Creates two different alphas - one is a Po210 alpha and the other is a Rn222 alpha.
+Alpha rn222alpha1;
 
 // An array containing 6 different movement possibilities for quadrant 1 in the x direction for the alpha particles produced from Po210.
 int xMPPFQ1Po210[6][11] = {
@@ -61,19 +61,34 @@ int yMPPFQ1Rn222[6][11] = {
   {160, 230, 303, 397, 463, 530, 604, 693, 782, 867, 938}
 };
 
-/* bool checkAlphaElectronDist()
+/* bool checkPo210AlphaElectronDist()
 
-    Returns false if the electrons have a distance greater then the specified distance away from the center of the detector. If all the electrons are within the specified distance
-    from the center of the detector return true.
+    Returns false if the Po210 electrons have a distance greater then the specified distance away from the center of the detector. If all the electrons are within the specified
+    distance from the center of the detector return true.
 
 */
-bool checkAlphaElectronDist() {
-  for (int loc = 0; loc < numElectronLocationsInArray; loc++) {
-    if (alphaElectrons[loc].rLocation > 20) {
-      return false;
+bool checkPo210AlphaElectronDist() {
+  for (int loc = 0; loc < numElectronLocationsInArray; loc++) { // For each variable in the electron array.
+    if (Po210AlphaElectrons[loc].rLocation > 20) { // Check to see if the radial location is greater then 20.
+      return false; // If one of the radial distances is over 20 return false and keep the electrons drifting towards the center of the circle.
     }
   }
-  return true;
+  return true; // If all electrons are within a radial distance of 20 then return true and stop the electrons from drifting within the detector.
+}
+
+/* bool checkRn222AlphaElectronDist()
+
+    Returns false if the Rn222 electrons have a distance greater then the specified distance away from the center of the detector. If all the electrons are within the specified
+    distance from the center of the detector return true.
+
+*/
+bool checkRn222AlphaElectronDist() {
+  for (int loc = 0; loc < numElectronLocationsInArray; loc++) { // For each variable in the electron array.
+    if (Rn222AlphaElectrons[loc].rLocation > 20) { // Check to see if the radial location is greater then 20.
+      return false; // If one of the radial distances is over 20 return false and keep the electrons drifting towards the center of the circle.
+    }
+  }
+  return true; // If all electrons are within a radial distance of 20 then return true and stop the electrons from drifting within the detector.
 }
 
 /* Alpha createNewPo210Alpha()
@@ -86,55 +101,53 @@ Alpha createNewPo210Alpha() {
   const int maxSINCOSvalue = 16384; // The largest value that can be returned from the SIN and COS functions as declared in Basics.cpp. This should remain 16384.
 
   randomSeed(0); // Randomizes the seed. This in theory adds another layer of random to the code.
-  int pathNumber = random(0, 6); // Picks a random number from 0 to 5.
-  int quadrantNumber = random(1, 5); // Picks a random number between 1 to 4.
-  int Po210alphaEnergy = 5300; // Should be 5300. In keV.
-  int arrayStartLocation = 0;
+  int pathNumber = random(0, 6); // Picks a random number from 0 to 5 for the path number.
+  int quadrantNumber = random(1, 5); // Picks a random number between 1 to 4 for the quadrant for the particle to start tracking in.
+  int Po210alphaEnergy = 5300; // Each Po210 generates with 5300 keV.
+  int arrayStartLocation = 0; // The starting array location.
 
-  Serial.print("Po 210: "); Serial.print(pathNumber); Serial.print("\t"); Serial.println(quadrantNumber);
+  Serial.print("Po 210: "); Serial.print(pathNumber); Serial.print("\t"); Serial.println(quadrantNumber); // Displays the quadrant and track type that is going to be displayed.
 
   Alpha newPo210Alpha;
 
-  for (int loc = 0; loc < 11; loc++) {
-    if (quadrantNumber ==  1) {
-      for (int loc = 0; loc < 11; loc++) {
-        newPo210Alpha.xMovementPath[loc] = xMPPFQ1Po210[pathNumber][loc]; // Fills the movement arrays.
-        newPo210Alpha.yMovementPath[loc] = yMPPFQ1Po210[pathNumber][loc];
-      }
-      newPo210Alpha.energy = Po210alphaEnergy;
-      newPo210Alpha.movementLocation = 0; // Creates the new cosmic ray with the new values.
+  if (quadrantNumber ==  1) { // If the partcle will appear in quadrant one.
+    for (int loc = 0; loc < numberOfParticleSteps; loc++) { // For each location that the particle will move.
+      newPo210Alpha.xMovementPath[loc] = xMPPFQ1Po210[pathNumber][loc]; // Fills the movement arrays for the x positions.
+      newPo210Alpha.yMovementPath[loc] = yMPPFQ1Po210[pathNumber][loc]; // Fills the movement arrays for the y positions.
     }
-    else if (quadrantNumber ==  2) {
-      for (int loc = 0; loc < 11; loc++) {
-        newPo210Alpha.xMovementPath[loc] = -1 * xMPPFQ1Po210[pathNumber][loc]; // Fills the movement arrays.
-        newPo210Alpha.yMovementPath[loc] = yMPPFQ1Po210[pathNumber][loc];
-      }
-      newPo210Alpha.energy = Po210alphaEnergy;
-      newPo210Alpha.movementLocation = 0; // Creates the new cosmic ray with the new values.
-    }
-    else if (quadrantNumber ==  3) {
-      for (int loc = 0; loc < 11; loc++) {
-        newPo210Alpha.xMovementPath[loc] = -1 * xMPPFQ1Po210[pathNumber][loc]; // Fills the movement arrays.
-        newPo210Alpha.yMovementPath[loc] = -1 * yMPPFQ1Po210[pathNumber][loc];
-      }
-      newPo210Alpha.energy = Po210alphaEnergy;
-      newPo210Alpha.movementLocation = 0; // Creates the new cosmic ray with the new values.
-    }
-    else if (quadrantNumber ==  4) {
-      for (int loc = 0; loc < 11; loc++) {
-        newPo210Alpha.xMovementPath[loc] = xMPPFQ1Po210[pathNumber][loc]; // Fills the movement arrays.
-        newPo210Alpha.yMovementPath[loc] = -1 * yMPPFQ1Po210[pathNumber][loc];
-      }
-      newPo210Alpha.energy = Po210alphaEnergy;
-      newPo210Alpha.movementLocation = 0; // Creates the new cosmic ray with the new values.
-    }
+    newPo210Alpha.energy = Po210alphaEnergy; // Sets the particles energy location.
+    newPo210Alpha.movementLocation = arrayStartLocation; // Sets the particles movement location to 0.
   }
-  return newPo210Alpha; // Returns this new alpha.
+  else if (quadrantNumber ==  2) { // If the partcle will appear in quadrant two.
+    for (int loc = 0; loc < numberOfParticleSteps; loc++) { // For each location that the particle will move.
+      newPo210Alpha.xMovementPath[loc] = -1 * xMPPFQ1Po210[pathNumber][loc]; // Fills the movement arrays for the x positions.
+      newPo210Alpha.yMovementPath[loc] = yMPPFQ1Po210[pathNumber][loc]; // Fills the movement arrays for the y positions.
+    }
+    newPo210Alpha.energy = Po210alphaEnergy; // Sets the particles energy location.
+    newPo210Alpha.movementLocation = arrayStartLocation; // Sets the particles movement location to 0.
+  }
+  else if (quadrantNumber ==  3) { // If the partcle will appear in quadrant three.
+    for (int loc = 0; loc < numberOfParticleSteps; loc++) { // For each location that the particle will move.
+      newPo210Alpha.xMovementPath[loc] = -1 * xMPPFQ1Po210[pathNumber][loc]; // Fills the movement arrays for the x positions.
+      newPo210Alpha.yMovementPath[loc] = -1 * yMPPFQ1Po210[pathNumber][loc]; // Fills the movement arrays for the y positions.
+    }
+    newPo210Alpha.energy = Po210alphaEnergy; // Sets the particles energy location.
+    newPo210Alpha.movementLocation = arrayStartLocation; // Sets the particles movement location to 0.
+  }
+  else if (quadrantNumber ==  4) { // If the partcle will appear in quadrant four.
+    for (int loc = 0; loc < numberOfParticleSteps; loc++) { // For each location that the particle will move.
+      newPo210Alpha.xMovementPath[loc] = xMPPFQ1Po210[pathNumber][loc]; // Fills the movement arrays for the x positions.
+      newPo210Alpha.yMovementPath[loc] = -1 * yMPPFQ1Po210[pathNumber][loc]; // Fills the movement arrays for the y positions.
+    }
+    newPo210Alpha.energy = Po210alphaEnergy; // Sets the particles energy location.
+    newPo210Alpha.movementLocation = arrayStartLocation; // Sets the particles movement location to 0.
+  }
+  return newPo210Alpha; // Returns this new alpha with the correct values.
 }
 
-/* Alpha createNewPo210Alpha()
+/* Alpha createNewRn222Alpha()
 
-   Creates a new Alpha particle with random properties.
+   Creates a new Rn 222 Alpha particle with random properties.
 
 */
 Alpha createNewRn222Alpha() {
@@ -142,75 +155,58 @@ Alpha createNewRn222Alpha() {
   const int maxSINCOSvalue = 16384; // The largest value that can be returned from the SIN and COS functions as declared in Basics.cpp. This should remain 16384.
 
   randomSeed(0); // Randomizes the seed. This in theory adds another layer of random to the code.
-  int pathNumber = random(0, 6); // Picks a random number from 0 to 5.
-  int quadrantNumber = random(1, 5); // Picks a random number between 1 to 4.
-  int Rn222alphaEnergy = 5500; // Should be 5500. Stated in keV.
-  int arrayStartLocation = 0;
+  int pathNumber = random(0, 6); // Picks a random number from 0 to 5 for the path number.
+  int quadrantNumber = random(1, 5); // Picks a random number between 1 to 4 for the quadrant for the particle to start tracking in.
+  int Rn222alphaEnergy = 5500; // Each Rn 222 alpha generates with 5500 keV.
+  int arrayStartLocation = 0; // The starting array location.
 
-  Serial.print("Rn 222: "); Serial.print(pathNumber); Serial.print("\t"); Serial.println(quadrantNumber);
+  Serial.print("Rn 222: "); Serial.print(pathNumber); Serial.print("\t"); Serial.println(quadrantNumber); // Displays the quadrant and track type that is going to be displayed.
 
   Alpha newRn222Alpha;
 
-  for (int loc = 0; loc < 11; loc++) {
-    if (quadrantNumber ==  1) {
-      newRn222Alpha = {{
-          xMPPFQ1Rn222[pathNumber][0], xMPPFQ1Rn222[pathNumber][1], xMPPFQ1Rn222[pathNumber][2], xMPPFQ1Rn222[pathNumber][3], xMPPFQ1Rn222[pathNumber][4], xMPPFQ1Rn222[pathNumber][5],
-          xMPPFQ1Rn222[pathNumber][6], xMPPFQ1Rn222[pathNumber][7], xMPPFQ1Rn222[pathNumber][8], xMPPFQ1Rn222[pathNumber][9], xMPPFQ1Rn222[pathNumber][10]
-        },
-        { yMPPFQ1Rn222[pathNumber][0], yMPPFQ1Rn222[pathNumber][1], yMPPFQ1Rn222[pathNumber][2], yMPPFQ1Rn222[pathNumber][3], yMPPFQ1Rn222[pathNumber][4], yMPPFQ1Rn222[pathNumber][5],
-          yMPPFQ1Rn222[pathNumber][6], yMPPFQ1Rn222[pathNumber][7], yMPPFQ1Rn222[pathNumber][8], yMPPFQ1Rn222[pathNumber][9], yMPPFQ1Rn222[pathNumber][10]
-        },
-        Rn222alphaEnergy, arrayStartLocation
-      }; // Creates the new Rn 222 alpha with the new values.
+  if (quadrantNumber ==  1) { // If the partcle will appear in quadrant one.
+    for (int loc = 0; loc < numberOfParticleSteps; loc++) { // For each location that the particle will move.
+      newRn222Alpha.xMovementPath[loc] = xMPPFQ1Rn222[pathNumber][loc]; // Fills the movement arrays for the x positions.
+      newRn222Alpha.yMovementPath[loc] = yMPPFQ1Rn222[pathNumber][loc]; // Fills the movement arrays for the y positions.
     }
-    else if (quadrantNumber ==  2) {
-      newRn222Alpha = {{
-          -1 * xMPPFQ1Rn222[pathNumber][0], -1 * xMPPFQ1Rn222[pathNumber][1], -1 * xMPPFQ1Rn222[pathNumber][2], -1 * xMPPFQ1Rn222[pathNumber][3], -1 * xMPPFQ1Rn222[pathNumber][4],
-          -1 * xMPPFQ1Rn222[pathNumber][5], -1 * xMPPFQ1Rn222[pathNumber][6], -1 * xMPPFQ1Rn222[pathNumber][7], -1 * xMPPFQ1Rn222[pathNumber][8], -1 * xMPPFQ1Rn222[pathNumber][9],
-          -1 * xMPPFQ1Rn222[pathNumber][10]
-        }, {
-          yMPPFQ1Rn222[pathNumber][0], yMPPFQ1Rn222[pathNumber][1], yMPPFQ1Rn222[pathNumber][2], yMPPFQ1Rn222[pathNumber][3], yMPPFQ1Rn222[pathNumber][4], yMPPFQ1Rn222[pathNumber][5],
-          yMPPFQ1Rn222[pathNumber][6], yMPPFQ1Rn222[pathNumber][7], yMPPFQ1Rn222[pathNumber][8], yMPPFQ1Rn222[pathNumber][9], yMPPFQ1Rn222[pathNumber][10]
-        }, Rn222alphaEnergy, arrayStartLocation
-      }; // Creates the new alpha with the new values.
+    newRn222Alpha.energy = Rn222alphaEnergy; // Sets the particles energy location.
+    newRn222Alpha.movementLocation = arrayStartLocation; // Sets the particles movement location to 0.
+  }
+  else if (quadrantNumber ==  2) { // If the partcle will appear in quadrant two.
+    for (int loc = 0; loc < numberOfParticleSteps; loc++) { // For each location that the particle will move.
+      newRn222Alpha.xMovementPath[loc] = -1 * xMPPFQ1Rn222[pathNumber][loc]; // Fills the movement arrays for the x positions.
+      newRn222Alpha.yMovementPath[loc] = yMPPFQ1Rn222[pathNumber][loc]; // Fills the movement arrays for the y positions.
     }
-    else if (quadrantNumber ==  3) {
-      newRn222Alpha = {{
-          -1 * xMPPFQ1Rn222[pathNumber][0], -1 * xMPPFQ1Rn222[pathNumber][1], -1 * xMPPFQ1Rn222[pathNumber][2], -1 * xMPPFQ1Rn222[pathNumber][3], -1 * xMPPFQ1Rn222[pathNumber][4],
-          -1 * xMPPFQ1Rn222[pathNumber][5], -1 * xMPPFQ1Rn222[pathNumber][6], -1 * xMPPFQ1Rn222[pathNumber][7], -1 * xMPPFQ1Rn222[pathNumber][8], -1 * xMPPFQ1Rn222[pathNumber][9],
-          -1 * xMPPFQ1Rn222[pathNumber][10]
-        },
-        { -1 * yMPPFQ1Rn222[pathNumber][0], -1 * yMPPFQ1Rn222[pathNumber][1], -1 * yMPPFQ1Rn222[pathNumber][2], -1 * yMPPFQ1Rn222[pathNumber][3], -1 * yMPPFQ1Rn222[pathNumber][4],
-          -1 * yMPPFQ1Rn222[pathNumber][5], -1 * yMPPFQ1Rn222[pathNumber][6], -1 * yMPPFQ1Rn222[pathNumber][7], -1 * yMPPFQ1Rn222[pathNumber][8], -1 * yMPPFQ1Rn222[pathNumber][9],
-          -1 * yMPPFQ1Rn222[pathNumber][10]
-        },
-        Rn222alphaEnergy, arrayStartLocation
-      }; // Creates the new alpha with the new values.
+    newRn222Alpha.energy = Rn222alphaEnergy; // Sets the particles energy location.
+    newRn222Alpha.movementLocation = arrayStartLocation; // Sets the particles movement location to 0.
+  }
+  else if (quadrantNumber ==  3) { // If the partcle will appear in quadrant three.
+    for (int loc = 0; loc < numberOfParticleSteps; loc++) { // For each location that the particle will move.
+      newRn222Alpha.xMovementPath[loc] = -1 * xMPPFQ1Rn222[pathNumber][loc]; // Fills the movement arrays for the x positions.
+      newRn222Alpha.yMovementPath[loc] = -1 * yMPPFQ1Rn222[pathNumber][loc]; // Fills the movement arrays for the y positions.
     }
-    else if (quadrantNumber ==  4) {
-      newRn222Alpha = {{
-          xMPPFQ1Rn222[pathNumber][0], xMPPFQ1Rn222[pathNumber][1], xMPPFQ1Rn222[pathNumber][2], xMPPFQ1Rn222[pathNumber][3], xMPPFQ1Rn222[pathNumber][4], xMPPFQ1Rn222[pathNumber][5],
-          xMPPFQ1Rn222[pathNumber][6], xMPPFQ1Rn222[pathNumber][7], xMPPFQ1Rn222[pathNumber][8], xMPPFQ1Rn222[pathNumber][9], xMPPFQ1Rn222[pathNumber][10]
-        },
-        { -1 * yMPPFQ1Rn222[pathNumber][0], -1 * yMPPFQ1Rn222[pathNumber][1], -1 * yMPPFQ1Rn222[pathNumber][2], -1 * yMPPFQ1Rn222[pathNumber][3], -1 * yMPPFQ1Rn222[pathNumber][4],
-          -1 * yMPPFQ1Rn222[pathNumber][5], -1 * yMPPFQ1Rn222[pathNumber][6], -1 * yMPPFQ1Rn222[pathNumber][7], -1 * yMPPFQ1Rn222[pathNumber][8], -1 * yMPPFQ1Rn222[pathNumber][9],
-          -1 * yMPPFQ1Rn222[pathNumber][10]
-        },
-        Rn222alphaEnergy, arrayStartLocation
-      }; // Creates the new Rn 222 alpha with the new values.
+    newRn222Alpha.energy = Rn222alphaEnergy; // Sets the particles energy location.
+    newRn222Alpha.movementLocation = arrayStartLocation; // Sets the particles movement location to 0.
+  }
+  else if (quadrantNumber ==  4) { // If the partcle will appear in quadrant four.
+    for (int loc = 0; loc < numberOfParticleSteps; loc++) { // For each location that the particle will move.
+      newRn222Alpha.xMovementPath[loc] = xMPPFQ1Rn222[pathNumber][loc]; // Fills the movement arrays for the x positions.
+      newRn222Alpha.yMovementPath[loc] = -1 * yMPPFQ1Rn222[pathNumber][loc]; // Fills the movement arrays for the y positions.
     }
+    newRn222Alpha.energy = Rn222alphaEnergy; // Sets the particles energy location.
+    newRn222Alpha.movementLocation = arrayStartLocation; // Sets the particles movement location to 0.
   }
   return newRn222Alpha; // Returns this new Rn 222 alpha.
 }
 
-/* Alpha computeNextAlphaLocation(Alpha alpha)
+/* Alpha computeNextPo210AlphaLocation(Alpha Po210Alpha)
 
-   Determines the next location for which a given alpha will move along with determining if an electron should appear and controlling said electrons.
+   Determines the next location for which a given Po210 Alpha will move along with determining if an electron should appear and controlling said electrons.
 
 */
 Alpha computeNextPo210AlphaLocation(Alpha Po210Alpha) {
-  int energyChangeLowerBounds = 300; // The smallest energy value the alpha can "lose" in one step. This is the minimum energy that can be transfered to an electron. Default is 60 keV.
-  int energyChangeUpperBounds = 400; // The largest energy value the alpha can "lose" in one step. This is the maxium energy that can be transfered to an electron. Default is 100 keV.
+  int energyChangeLowerBounds = 300; // The smallest energy value the alpha can "lose" in one step to an electron. Default is 300 keV.
+  int energyChangeUpperBounds = 400; // The largest energy value the alpha can "lose" in one step to an electron. Default is 400 keV.
 
   randomSeed(0); // Randomizes the seed.
 
@@ -218,39 +214,38 @@ Alpha computeNextPo210AlphaLocation(Alpha Po210Alpha) {
   int yCurrent = Po210Alpha.yMovementPath[Po210Alpha.movementLocation];
   int energyCurrent = Po210Alpha.energy;
 
-  if (Po210Alpha.movementLocation < 11) { // If the alpha can exist.
+  if (Po210Alpha.movementLocation < numberOfParticleSteps) { // If the alpha can exist.
     int energyChange = random(energyChangeLowerBounds, energyChangeUpperBounds); // Calculates the energy change that the electron will gain if created in keV.
-    alphaElectrons[alphaElectronLocation] = generateElectron(xCurrent, yCurrent, energyChange); // Generates an electron and saves it.
+    Po210AlphaElectrons[alphaElectronLocation] = generateElectron(xCurrent, yCurrent, energyChange); // Generates an electron and saves it.
     energyCurrent = energyCurrent - energyChange; // Lowers the energy of the alpha.
     alphaElectronLocation++; // Increases the count for which the next electron will be added into the array.
 
     if (alphaElectronLocation == numElectronLocationsInArray) // If the array is filled rotate around and start filling it again.
       alphaElectronLocation = 0; // Resets the array position counter to 0.
 
-
     for (int loc = 0; loc < numElectronLocationsInArray; loc++)  // For every position in the array...
-      alphaElectrons[loc] = computeNextElectronLocation(alphaElectrons[loc]); // Computes and moves the electon through its current step.
+      Po210AlphaElectrons[loc] = computeNextElectronLocation(Po210AlphaElectrons[loc]); // Computes and moves the electon through its current step.
 
-    simulateTrack(energyCurrent, xCurrent, yCurrent); // Updates the alphas position.
-    Po210Alpha.energy = energyCurrent;
-    Po210Alpha.movementLocation = Po210Alpha.movementLocation + 1; // Creates the new alpha with the new values.
-    return Po210Alpha; // Returns this new electron.
+    simulateTrack(energyCurrent, xCurrent, yCurrent); // Displays the alphas position.
+    Po210Alpha.energy = energyCurrent; // Updates the current energy of the particle.
+    Po210Alpha.movementLocation = Po210Alpha.movementLocation + 1; // Increases the movement location variable by 1.
+    return Po210Alpha; // Returns this new Alpha.
   }
-  else { // If the alpha has left the detector or has no more energy...
+  else { // If the alpha has finished its set path.
     Po210AlphaDone = true;
     Alpha newPo210Alpha = createNewPo210Alpha(); // Create a new alpha.
-    while (checkAlphaElectronDist() == false) {
-      displayDetector();
+    while (checkPo210AlphaElectronDist() == false) { // While the electrons have not drifted towards the center of the detector.
+      displayDetector(); // Display the detector.
       for (int loc = 0; loc < numElectronLocationsInArray; loc++) // For every position in the array...
-        alphaElectrons[loc] = computeNextElectronLocation(alphaElectrons[loc]); // Computes and moves the electon through its current step.
+        Po210AlphaElectrons[loc] = computeNextElectronLocation(Po210AlphaElectrons[loc]); // Computes and moves the electon through its current step.
     }
-    return newPo210Alpha; // Returns the new alpha so that the infinite loop can be continued.
+    return newPo210Alpha; // Returns the new Po210 alpha so that the infinite loop can be continued.
   }
 }
 
-/* Alpha computeNextAlphaLocation(Alpha alpha)
+/* Alpha computeNextRn222AlphaLocation(Alpha Rn222Alpha)
 
-   Determines the next location for which a given alpha will move along with determining if an electron should appear and controlling said electrons.
+   Determines the next location for which a given Rn 222 alpha will move along with determining if an electron should appear and controlling said electrons.
 
 */
 Alpha computeNextRn222AlphaLocation(Alpha Rn222Alpha) {
@@ -263,9 +258,9 @@ Alpha computeNextRn222AlphaLocation(Alpha Rn222Alpha) {
   int yCurrent = Rn222Alpha.yMovementPath[Rn222Alpha.movementLocation];
   int energyCurrent = Rn222Alpha.energy;
 
-  if (Rn222Alpha.movementLocation < 11) { // If the alpha can exist.
+  if (Rn222Alpha.movementLocation < numberOfParticleSteps) { // If the alpha can exist.
     int energyChange = random(energyChangeLowerBounds, energyChangeUpperBounds); // Calculates the energy change that the electron will gain if created in keV.
-    alphaElectrons[alphaElectronLocation] = generateElectron(xCurrent, yCurrent, energyChange); // Generates an electron and saves it.
+    Rn222AlphaElectrons[alphaElectronLocation] = generateElectron(xCurrent, yCurrent, energyChange); // Generates an electron and saves it.
     energyCurrent = energyCurrent - energyChange; // Lowers the energy of the alpha.
     alphaElectronLocation++; // Increases the count for which the next electron will be added into the array.
 
@@ -273,23 +268,23 @@ Alpha computeNextRn222AlphaLocation(Alpha Rn222Alpha) {
       alphaElectronLocation = 0; // Resets the array position counter to 0.
 
     for (int loc = 0; loc < numElectronLocationsInArray; loc++)  // For every position in the array...
-      alphaElectrons[loc] = computeNextElectronLocation(alphaElectrons[loc]); // Computes and moves the electon through its current step.
+      Rn222AlphaElectrons[loc] = computeNextElectronLocation(Rn222AlphaElectrons[loc]); // Computes and moves the electon through its current step.
 
-    simulateTrack(energyCurrent, xCurrent, yCurrent); // Updates the alphas position.
-    Rn222Alpha.energy = energyCurrent;
-    Rn222Alpha.movementLocation = Rn222Alpha.movementLocation + 1; // Creates the new alpha with the new values.
-    return Rn222Alpha; // Returns this new electron.
+    simulateTrack(energyCurrent, xCurrent, yCurrent); // Displays the alphas position.
+    Rn222Alpha.energy = energyCurrent; // Updates the energy variable.
+    Rn222Alpha.movementLocation = Rn222Alpha.movementLocation + 1; // Updated the movement location varaible by increasing it by one.
+    return Rn222Alpha; // Returns this new Alpha.
   }
-  else { // If the alpha has left the detector or has no more energy...
+  else { // If the alpha has finished its set path.
     Rn222AlphaDone = true;
     Alpha newRn222Alpha = createNewRn222Alpha(); // Create a new alpha.
 
-    while (checkAlphaElectronDist() == false) {
-      displayDetector();
+    while (checkRn222AlphaElectronDist() == false) { // If the Rn 222 electrons haven't reached the middle of the detector yet. 
+      displayDetector(); // Displays the detector.
       for (int loc = 0; loc < numElectronLocationsInArray; loc++) // For every position in the array...
-        alphaElectrons[loc] = computeNextElectronLocation(alphaElectrons[loc]); // Computes and moves the electon through its current step.
+        Rn222AlphaElectrons[loc] = computeNextElectronLocation(Rn222AlphaElectrons[loc]); // Computes and moves the electon through its current step.
     }
-    return newRn222Alpha; // Returns the new alpha so that the infinite loop can be continued.
+    return newRn222Alpha; // Returns the new Rn222 alpha so that the infinite loop can be continued.
   }
 }
 
