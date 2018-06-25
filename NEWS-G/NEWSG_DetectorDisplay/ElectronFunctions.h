@@ -1,7 +1,7 @@
-
 #ifndef ELECTRONFUNCTIONS_H
 #define ELECTRONFUNCTIONS_H
 
+// Include files.
 #include "CommonFunctions.h"
 
 // Creates an Electron struct. An electron is made up of a radial location, and angular location, and an energy.

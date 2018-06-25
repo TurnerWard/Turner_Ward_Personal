@@ -1,8 +1,10 @@
 #ifndef COSMICRAYFUNCTIONS_H
 #define COSMICRAYFUNCTIONS_H
 
+// Include files.
 #include "CommonFunctions.h"
 #include "ElectronFunctions.h"
+#include <avr/pgmspace.h>
 
 Electron cosmicElectrons[11]; // Creates an array of 11 electrons. The number of array values needs to be equal to that of the numElectronLocationInArray variable.
 
@@ -17,7 +19,7 @@ typedef struct CosmicRay {
 CosmicRay cosmicray1; // Creates a cosmic ray.
 
 // An array containing 6 different movement possibilities for quadrant 1 in the x direction for the cosmic ray particles.
-int xMPPFQ1Muon[6][11] {
+const int xMPPFQ1Muon[6][11] PROGMEM = { // Note: This array is stored in flash memory which allows for more dynamic memory to be free!
   {320, 70, -190, -464, -720, -940, -1170, -1366, -1596, -1790, -2010},
   {240, 120, -1, -130, -260,  -380,  -464,  -560, -640, -720,  -890},
   {374, 450, 520, 610, 674, 756, 840, 885, 960, 1040, 1110},
@@ -27,7 +29,7 @@ int xMPPFQ1Muon[6][11] {
 };
 
 // An array containing 6 different movement possibilities for quadrant 1 in the y direction for the cosmic ray particles.
-int yMPPFQ1Muon[6][11] {
+const int yMPPFQ1Muon[6][11] PROGMEM = { // Note: This array is stored in flash memory which allows for more dynamic memory to be free!
   {1980, 1740, 1500, 1283, 1060, 870, 665, 480, 284, 106, -70},
   {2020, 1474, 895, 494, 106, -220, -500, -835,  -1163,  -1440, -1840},
   {2000, 1585, 1210, 850, 500, 120, -280, -630, -990, -1350, -1694},
@@ -44,9 +46,8 @@ int yMPPFQ1Muon[6][11] {
 */
 bool checkCosmicElectronDist() {
   for (int loc = 0; loc < numElectronLocationsInArray; loc++) { // For each variable in the electron array.
-    if (cosmicElectrons[loc].rLocation > 20) { // Check to see if the radial location is greater then 20.
+    if (cosmicElectrons[loc].rLocation > 20) // Check to see if the radial location is greater then 20.
       return false; // If one of the radial distances is over 20 return false and keep the electrons drifting towards the center of the circle.
-    }
   }
   return true; // If all electrons are within a radial distance of 20 then return true and stop the electrons from drifting within the detector.
 }
@@ -57,35 +58,35 @@ CosmicRay createNewCosmicRay() {
   randomSeed(0); // Randomizes the seed. This in theory adds another layer of random to the code.
   int pathNumber = random(0, 6); // Picks a random number from 0 to 5 for the path.
   int halfNumber = random(1, 3); // Picks a random number between 1 and 2 for the half of the detector that the particle is displayed in.
-  int cosmicrayEnergy = 5300; // Each Cosmic Ray generates with 5300 keV.
+  int cosmicrayEnergy = 5300; // Each Cosmic Ray is generated with 5300 keV.
   int arrayStartLocation = 0; // Keeps track of the arrays start location (ie. 0).
 
-  Serial.print("Cosmic Ray: "); Serial.print(pathNumber); Serial.print("\t"); Serial.println(halfNumber);
+  Serial.print("Cosmic Ray -> Path #: "); Serial.print(pathNumber); Serial.print("\t Half #: "); Serial.println(halfNumber);
 
-  CosmicRay newCosmicRay;
+  CosmicRay newCosmicRay; // Creates a new cosmic ray.
 
-  if (halfNumber ==  1) {
-    for (int loc = 0; loc < numElectronLocationsInArray; loc++) {
-      newCosmicRay.xMovementPath[loc] = xMPPFQ1Muon[pathNumber][loc]; // Fills the movement arrays.
-      newCosmicRay.yMovementPath[loc] = yMPPFQ1Muon[pathNumber][loc];
+  if (halfNumber ==  1) { // If in the first half.
+    for (int loc = 0; loc < numberOfParticleSteps; loc++) { // For each step for the particle.
+      newCosmicRay.xMovementPath[loc] = pgm_read_word(&(xMPPFQ1Muon[pathNumber][loc])); // Fills the x movement array from PROGMEM.
+      newCosmicRay.yMovementPath[loc] = pgm_read_word(&(yMPPFQ1Muon[pathNumber][loc])); // Fills the y movement array from PROGMEM.
     }
-    newCosmicRay.energy = cosmicrayEnergy;
-    newCosmicRay.movementLocation = arrayStartLocation; // Creates the new cosmic ray with the new values.
+    newCosmicRay.energy = cosmicrayEnergy; // Enters the cosmic rays energy.
+    newCosmicRay.movementLocation = arrayStartLocation; // Sets the arrays start location.
   }
-  else if (halfNumber ==  2) {
-    for (int loc = 0; loc < numElectronLocationsInArray; loc++) {
-      newCosmicRay.xMovementPath[loc] = -1 * xMPPFQ1Muon[pathNumber][loc]; // Fills the movement arrays.
-      newCosmicRay.yMovementPath[loc] = yMPPFQ1Muon[pathNumber][loc];
+  else if (halfNumber ==  2) { // If in the second half.
+    for (int loc = 0; loc < numElectronLocationsInArray; loc++) { // For each step for the particle.
+      newCosmicRay.xMovementPath[loc] = -1 * pgm_read_word(&(xMPPFQ1Muon[pathNumber][loc])); // Fills the x movement array from PROGMEM.
+      newCosmicRay.yMovementPath[loc] = pgm_read_word(&(yMPPFQ1Muon[pathNumber][loc])); // Fills the y movement array from PROGMEM.
     }
-    newCosmicRay.energy = cosmicrayEnergy;
-    newCosmicRay.movementLocation = arrayStartLocation; // Creates the new cosmic ray with the new values.
+    newCosmicRay.energy = cosmicrayEnergy; // Enters the cosmic rays energy.
+    newCosmicRay.movementLocation = arrayStartLocation; // Sets the arrays start location.
   }
   return newCosmicRay; // Returns this new cosmic ray.
 }
 
 CosmicRay computeNextCosmicRayLocation(CosmicRay cosmicray) {
-  int energyChangeLowerBounds = 300; // The smallest energy value the alpha can "lose" in one step to an electron. Default is 300 keV.
-  int energyChangeUpperBounds = 400; // The largest energy value the alpha can "lose" in one step to an electron. Default is 400 keV.
+  int energyChangeLowerBounds = 300; // The smallest energy value the alpha can "lose" in one step to an electron or in general. Default is 300 keV.
+  int energyChangeUpperBounds = 400; // The largest energy value the alpha can "lose" in one step to an electron or in general. Default is 400 keV.
 
   randomSeed(0); // Randomizes the seed.
 
@@ -93,9 +94,9 @@ CosmicRay computeNextCosmicRayLocation(CosmicRay cosmicray) {
   int yCurrent = cosmicray.yMovementPath[cosmicray.movementLocation];
   int energyCurrent = cosmicray.energy;
 
-  if (cosmicray.movementLocation < 11) { // If the cosmic ray can exist.
+  if (cosmicray.movementLocation < numberOfParticleSteps) { // If the cosmic ray can exist.
     int energyChange = random(energyChangeLowerBounds, energyChangeUpperBounds); // Calculates the energy change that the electron will gain if created in keV.
-    if (cosmicray.movementLocation % 2 == 0) { // Results in the stated percent chance to generate an electron with each step.
+    if (cosmicray.movementLocation % 2 == 0) { // Results in an electron being produced each second step.
       cosmicElectrons[cosmicrayElectronLocation] = generateElectron(xCurrent, yCurrent, energyChange); // Generates an electron and saves it.
       energyCurrent = energyCurrent - energyChange; // Lowers the energy of the cosmic ray.
       cosmicrayElectronLocation++; // Increases the count for which the next electron will be added into the array.

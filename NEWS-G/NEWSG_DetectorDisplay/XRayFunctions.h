@@ -1,7 +1,7 @@
-
 #ifndef XRAYFUNCTIONS_H
 #define XRAYFUNCTIONS_H
 
+// Include files.
 #include "CommonFunctions.h"
 
 // Creates an XRay struct. An xray is made up of a radial location, and angular location, and an energy.
