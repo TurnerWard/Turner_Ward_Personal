@@ -12,7 +12,7 @@ int Po210AlphaElectronLocation = 0, Rn222AlphaElectronLocation = 0, cosmicrayEle
 
 /* void simulateTrack(int energy, int xMiddlePoint, int yMiddlePoint)
 
-   Simulates an electron track using a disk where the energy is represented as the size of the disk and the middle points of the disk can be specified.
+   Simulates a track using a disk where the energy is represented as the size of the disk and the middle points of the disk can be specified.
 
 */
 void simulateTrack(int energy, int xMiddlePoint, int yMiddlePoint) {
