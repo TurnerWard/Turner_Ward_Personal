@@ -5,23 +5,23 @@ Arduino code to control a DAC that controls the galvo system motors to display t
 
 ### Arduino Standard
 
-|**Name and Arguments**     |**Description**                                           |
-|-------------|------------------------------------------------------------------------|
-|setup()      |Initiates all the pins and functions needed to control the DAC and laser.|
-|loop()       |Runs repeatedly and controls the main flow of the program.               |
+|**Name** 				|**Arguments** | **Description**                                          				    |
+|-----------------------|-------------------------------------------------------------------------------------------|
+|setup()      			| 			   | Initiates all the pins and functions needed to control the DAC and laser.  |
+|loop()       			| 			   | Runs repeatedly and controls the main flow of the program.                 |
 
-### NEWS-G Additional Structs
+## The following NEWS-G specific functions have been broken down based on the file that they are in. This makes the purpose of each file very clear and easy to follow.
 
-|**Struct Name** | **Variables within Struct**   |**Description**                      |
-|-------------|------------------------------------------------------------------------|---|
-|Electron     |int rLocation, int thetaLocation, int energy | The electron struct contains all the information that needs to be tracked within an electron. |
-|Alpha        |int xMovementPath[11] int yMovementPath[11], int energy, int movementLocation | The alpha struct contains all the information that needs to be tracked within an alpha. |
-|Cosmic Ray   |int xMovementPath[11] int yMovementPath[11], int energy, int movementLocation | The cosmic ray struct contains all the information that needs to be tracked within a cosmic ray. |
+### NEWSG_DetectorDisplay.ino
 
-### NEWS-G Controller Specific 
+#### Variables:
+	-> Po210AlphaButtonPin = 3
+	-> Rn222AlphaButtonPin = 4
+	-> CosmicRayButtonPin = 6
+	-> PointLikeParticleButtonPin = 8
 
-|**Name and Arguments**   		    |**Description**                                                        								  					|
-|-----------------------------------|---------------------------------------------------------------------------------------------------------------------------|
-
-
+|**Name** 				|**Arguments** | **Description**                                          				    |
+|-----------------------|-------------------------------------------------------------------------------------------|
+|void detectorBrain()   | 			   | The brain that controls the detectors display. This function determines which functions are currently running, keeps track of what functions need to be called based on the stage of the particle, and determine when the user wants a specific track to be displayed.  |
+|void displayDetector() | 			   | Using the predetermined SIN and COS arrays to display a circle along with a rod, this function displays the detector. |
 

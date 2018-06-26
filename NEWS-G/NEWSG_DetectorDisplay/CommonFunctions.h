@@ -7,9 +7,8 @@
 // Variable declaration.
 Laser redlaser(5); // Initiates a red laser in the 5th arduino pin.
 bool Po210AlphaDone = true, Rn222AlphaDone = true, cosmicrayDone = true, pointlikeparticleDone = true;
-int numElectronLocationsInArray = 11; // The number of electrons that can be tracked.
-int Po210AlphaElectronLocation = 0, Rn222AlphaElectronLocation = 0, cosmicrayElectronLocation = 0; // The current location for which an electron should be added in.
-int numberOfParticleSteps = 11; // The number of electron steps that are contained within the particle.
+int numElectronLocationsInArray = 11, numberOfParticleSteps = 11; // The number of electrons that can be tracked and  number of electron steps that are contained within the particle.
+int Po210AlphaElectronLocation = 0, Rn222AlphaElectronLocation = 0, cosmicrayElectronLocation = 0; // The current location for which an electron should be added into the array.
 
 /* void simulateTrack(int energy, int xMiddlePoint, int yMiddlePoint)
 
@@ -24,7 +23,7 @@ void simulateTrack(int energy, int xMiddlePoint, int yMiddlePoint) {
   redlaser.on(); // Turns the red laser on.
   for (int loc = 0; loc <= 360; loc += 60) // Flips through the circle degrees in steps of 60.
     redlaser.sendto(SIN(loc) * energy / 16384 + xMiddlePoint, COS(loc) * energy / 16384 + yMiddlePoint); // Moves the laser around the circle in steps of 60.
-  redlaser.off(); // At the end turns off the laser.
+  redlaser.off(); // Turns off the laser.
 }
 
 /* void displayDetector()

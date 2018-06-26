@@ -4,8 +4,8 @@
 // Include files.
 #include "CommonFunctions.h"
 
-// Creates an Electron struct. An electron is made up of a radial location, and angular location, and an energy.
-typedef struct Electron {
+// Creates an Electron struct. An electron is made up of a radial location, and angular location, an energy, and a boolean variable to track if the particle is currently acting as
+typedef struct Electron {   // an electron or ion. 
   int rLocation;
   int thetaLocation;
   int energy;
@@ -19,13 +19,19 @@ typedef struct Electron {
 */
 Electron generateElectron(int xLocation, int yLocation, int energyDeposited) {
   Electron newElectron; // Creates a new electron using the electron struct.
-  if (yLocation >= 0) // If in the upper two quadrants.
+  if (yLocation >= 0) { // If in the upper two quadrants.
     newElectron = {int(sqrt(pow(xLocation, 2) + pow(yLocation, 2))), int(round( atan2 (yLocation, xLocation) * 180 / 3.14159265 )), energyDeposited, false};
-  else if (xLocation <= 0 && yLocation <= 0) // If in the bottom left quadrant.
+    // The new electrons location can be computed normally in this case.
+  }
+  else if (xLocation <= 0 && yLocation <= 0) {
+  // If in the bottom left quadrant.
     newElectron = {int(sqrt(pow(xLocation, 2) + pow(yLocation, 2))), int(180 + round( atan2 (abs(yLocation), abs(xLocation)) * 180 / 3.14159265 )), energyDeposited, false};
-  else // Otherwise in the bottom right quadrant.
+    // The new electrons location cannot be normally computed here. The angle value needs to be corrected as seen above.
+  }
+  else { // Otherwise in the bottom right quadrant.
     newElectron = {int(sqrt(pow(xLocation, 2) + pow(yLocation, 2))), int(180 + round( atan2 (-1 * yLocation, -1 * xLocation) * 180 / 3.14159265 )), energyDeposited, false};
-
+    // The new electrons location cannot be normally computed here. The angle value needs to be corrected as seen above.
+  }
   return newElectron; // Returns the electron struct.
 }
 
@@ -52,27 +58,23 @@ Electron computeNextElectronLocation(Electron electron) {
 
   if (rCurrent > 0 and electron.ion == false) { // If the electron exists (ie. has a radius that is not at the center of the detector and has a positive energy).
     if (rCurrent > rStrongElectricField && energyCurrent > 0) { // While outside the inner radius where the electric field is weaker and the electron still has energy.
-      //int rMovement = random(rMovementLowerBounds, rMovementUpperBounds) + electron.speedMultiplier; // Generates a random value between the declared values for the r change.
       int rMovement = -6 + 86 / (1 + pow(rCurrent / 1014, 2.14)); // The equation for which the speed that the electron will take follows.
       int thetaMovement = random(-thetaMovementBounds, thetaMovementBounds); // Generates a random value between the declared values for the theta change.
       int energyChange = random(energyChangeLowerBounds, energyChangeUpperBounds); // Generates a random value between the declared values for the energy change.
       rCurrent = rCurrent - rMovement; // Updates the current radius value.
       thetaCurrent = thetaCurrent + thetaMovement; // Updates the current theta value.
       energyCurrent = energyCurrent - energyChange; // Updates the current energy value.
-
-      simulateTrack(energyCurrent, rCurrent * COS(thetaCurrent) / maxSINCOSvalue, rCurrent * SIN(thetaCurrent) / maxSINCOSvalue);
+      simulateTrack(energyCurrent, rCurrent * COS(thetaCurrent) / maxSINCOSvalue, rCurrent * SIN(thetaCurrent) / maxSINCOSvalue); // Displays the electron.
       Electron newElectron = {rCurrent, thetaCurrent, energyCurrent, false}; // Creates the new elecron with the new values.
       return newElectron; // Returns this new electron.
     }
     else if (rCurrent <= rStrongElectricField && 0 < rCurrent && energyCurrent > 0) { // While the electron is within the strong electric field range and has energy.
-      //int rMovement = random(rMovementLowerBounds, rMovementUpperBounds); // Generates a random value between the declared values for the r change.
       int rMovement = -6 + 86 / (1 + pow(rCurrent / 1014, 2.14)); // The equation for which the speed that the electron will take follows.
       int energyChange = random(energyChangeLowerBounds, energyChangeUpperBounds); // Generates a random value between the declared values for the energy change.
       rCurrent = rCurrent - rMovement; // Updates the current radius value.
       energyCurrent = energyCurrent - energyChange; // Updates the current energy value.
-
       simulateTrack(energyCurrent, rCurrent * COS(thetaCurrent) / maxSINCOSvalue, rCurrent * SIN(thetaCurrent) / maxSINCOSvalue); // Displays the electron.
-      Electron newElectron;
+      Electron newElectron; // Creates a new electron variable.
       if (rCurrent < 0)
         newElectron = {rCurrent, random(0,361), energyCurrent, true}; // Creates the new elecron which will act as an ion with the new values. Note these ions are generated with
       else                                                            // random values currently but even spacing could be implimented if wanted.
@@ -81,24 +83,24 @@ Electron computeNextElectronLocation(Electron electron) {
     }
   }
   else if (rCurrent < 2048 and electron.ion == true) {
-    if (rCurrent > rStrongElectricField && energyCurrent > 0) { // While outside the inner radius where the electric field is weaker and the electron still has energy.
-      int rMovement = -6 + 86 / (1 + pow(rCurrent / 1014, 2.14)); // The equation for which the speed that the electron will take follows.
+    if (rCurrent > rStrongElectricField && energyCurrent > 0) { // While outside the inner radius where the electric field is weaker and the ion still has energy.
+      int rMovement = -6 + 86 / (1 + pow(rCurrent / 1014, 2.14)); // The equation for which the speed that the ion will take follows.
       rCurrent = rCurrent + rMovement; // Updates the current radius value.
 
-      simulateTrack(energyCurrent, rCurrent * COS(thetaCurrent) / maxSINCOSvalue, rCurrent * SIN(thetaCurrent) / maxSINCOSvalue);
-      Electron newElectron = {rCurrent, thetaCurrent, energyCurrent, true}; // Creates the new elecron with the new values.
+      simulateTrack(energyCurrent, rCurrent * COS(thetaCurrent) / maxSINCOSvalue, rCurrent * SIN(thetaCurrent) / maxSINCOSvalue); // Displaus the ion.
+      Electron newElectron = {rCurrent, thetaCurrent, energyCurrent, true}; // Creates the new ion with the new values.
       return newElectron; // Returns this new electron.
     }
-    else if (rCurrent <= rStrongElectricField && energyCurrent > 0) { // While the electron is within the strong electric field range and has energy.
-      int rMovement = -6 + 86 / (1 + pow(rCurrent / 1014, 2.14)); // The equation for which the speed that the electron will take follows.
+    else if (rCurrent <= rStrongElectricField && energyCurrent > 0) { // While the ion is within the strong electric field range and has energy.
+      int rMovement = -6 + 86 / (1 + pow(rCurrent / 1014, 2.14)); // The equation for which the speed that the ion will take follows.
       rCurrent = rCurrent + rMovement; // Updates the current radius value.
 
-      simulateTrack(energyCurrent, rCurrent * COS(thetaCurrent) / maxSINCOSvalue, rCurrent * SIN(thetaCurrent) / maxSINCOSvalue); // Displays the electron.
-      Electron newElectron = {rCurrent, thetaCurrent, energyCurrent, true}; // Creates the new elecron with the new values.
-      return newElectron; // Returns this new electron.
+      simulateTrack(energyCurrent, rCurrent * COS(thetaCurrent) / maxSINCOSvalue, rCurrent * SIN(thetaCurrent) / maxSINCOSvalue); // Displays the ion.
+      Electron newElectron = {rCurrent, thetaCurrent, energyCurrent, true}; // Creates the new ion with the new values.
+      return newElectron; // Returns this new ion.
     }
   }
-  else {
+  else { // If the electron in an ion and its outside of the detector then.
     Electron newElectron = {2050, 0, 0, true}; // Creates the new elecron with the new values.
     return newElectron; // Returns this new electron.
   }
