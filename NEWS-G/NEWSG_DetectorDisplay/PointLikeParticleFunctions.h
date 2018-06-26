@@ -39,7 +39,7 @@ const int yMPPFQ1PointLikeParticle[7][11] PROGMEM = { // Note: This array is sto
   {570, 510, 450, 395, 333, 280, 227, 165, 103, 25, -40} // 6
 };
 
-const int PointLikeParticleEnergy[11] PROGMEM = {2200,800,1000,1800,2000,1600,1200};
+const int PointLikeParticleEnergy[11] PROGMEM = {2200, 800, 1000, 1800, 2000, 1600, 1200};
 
 /* bool checkPointLikeParticleElectronDist()
 
@@ -103,7 +103,7 @@ PointLikeParticle createNewPointLikeParticle() {
 }
 
 PointLikeParticle computeNextPointLikeParticleLocation(PointLikeParticle pointlikeparticle) {
-   int energyChangeLowerBounds = 300; // The smallest energy value the alpha can "lose" in one step to an electron or in general. Default is 300 keV.
+  int energyChangeLowerBounds = 300; // The smallest energy value the alpha can "lose" in one step to an electron or in general. Default is 300 keV.
   int energyChangeUpperBounds = 400; // The largest energy value the alpha can "lose" in one step to an electron or in general. Default is 400 keV.
 
   randomSeed(0); // Randomizes the seed.
@@ -112,6 +112,13 @@ PointLikeParticle computeNextPointLikeParticleLocation(PointLikeParticle pointli
   int yCurrent = pointlikeparticle.yMovementPath[pointlikeparticle.movementLocation];
   int energyCurrent = pointlikeparticle.energy;
 
+  if (pointlikeparticle.movementLocation == numberOfParticleSteps - 1) {
+    int xFinal = pointlikeparticle.xMovementPath[pointlikeparticle.movementLocation - 1]; // Saves the passed in xLocation, yLocation, and energy values.
+    int yFinal = pointlikeparticle.yMovementPath[pointlikeparticle.movementLocation - 1];
+    for (int loc = 0; loc < pointlikeparticle.energy / 200; loc++)
+      pointlikeparticlesElectrons[loc] = generateElectron(xFinal, yFinal, pointlikeparticle.energy / 5); // Generates an electron and saves it.
+  }
+
   if (pointlikeparticle.movementLocation < numberOfParticleSteps) { // If the cosmic ray can exist.
     simulateTrack(energyCurrent, xCurrent, yCurrent); // Updates the cosmic rays position.
     pointlikeparticle.energy = energyCurrent; // Updates the cosmic rays energy.
@@ -119,21 +126,17 @@ PointLikeParticle computeNextPointLikeParticleLocation(PointLikeParticle pointli
     return pointlikeparticle; // Returns this new cosmic ray.
   }
   else { // If the cosmic ray has left the detector or has no more energy...
-    pointlikeparticleDone = true;
-
-    int xFinal = pointlikeparticle.xMovementPath[pointlikeparticle.movementLocation-1]; // Saves the passed in xLocation, yLocation, and energy values.
-    int yFinal = pointlikeparticle.yMovementPath[pointlikeparticle.movementLocation-1];
-    
-    for(int loc = 0; loc < pointlikeparticle.energy/200; loc++)
-      pointlikeparticlesElectrons[loc] = generateElectron(xFinal, yFinal, pointlikeparticle.energy/5); // Generates an electron and saves it.
-    
-    while (checkPointLikeParticleElectronDist() == false) { // While the cosmic rays are not at the center of the detector.
+    if (checkPointLikeParticleElectronDist() == false) {
       displayDetector(); // Displays the detector.
       for (int loc = 0; loc < numElectronLocationsInArray; loc++) // For every position in the array...
         pointlikeparticlesElectrons[loc] = computeNextElectronLocation(pointlikeparticlesElectrons[loc]); // Computes and moves the electon through its current step.
+      return pointlikeparticle;
     }
-    PointLikeParticle newPointLikeParticle = createNewPointLikeParticle(); // Create a new cosmic ray.
-    return newPointLikeParticle; // Returns the new alpha so that the infinite loop can be continued.
+    else {
+      pointlikeparticleDone = true;
+      PointLikeParticle newPointLikeParticle = createNewPointLikeParticle(); // Create a new cosmic ray.
+      return newPointLikeParticle; // Returns the new alpha so that the infinite loop can be continued.
+    }
   }
 }
 

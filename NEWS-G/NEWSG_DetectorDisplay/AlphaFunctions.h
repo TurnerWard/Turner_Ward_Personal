@@ -7,9 +7,6 @@
 #include "ElectronFunctions.h"
 #include "PointLikeParticleFunctions.h"
 
-// Variable declaration.
-Electron alphaElectrons[11]; // Creates an array of 11 electrons. The value within the array needs to be equal to that of the numElectronLocationInArray variable.
-
 // Creates an Alpha struct. An alpha is made up of a x location, a y location, an energy, and a constant value for the movement in both the x direction and y direction as well as
 // a total distance it can travel and a varible to track its distance.
 typedef struct Alpha {
@@ -19,8 +16,11 @@ typedef struct Alpha {
   int movementLocation;
 } Alpha;
 
+// Variable declaration.
+Electron alphaElectrons[11]; // Creates an array of 11 electrons. The value within the array needs to be equal to that of the numElectronLocationInArray variable.
+Alpha computeNextRn222AlphaLocation(Alpha Rn222Alpha);
 Alpha po210alpha1; // Two different Alpha particles - one is from Po 210, one is from Rn 222.
-Alpha rn222alpha1; 
+Alpha rn222alpha1;
 
 // An array containing 6 different movement possibilities for quadrant 1 in the x direction for the alpha particles produced from Po210.
 const int xMPPFQ1Po210[6][11] PROGMEM = { // Note: This array is stored in flash memory which allows for more dynamic memory to be free!
@@ -96,38 +96,38 @@ Alpha createNewPo210Alpha() {
 
   Alpha newPo210Alpha; // Creates a new Po 210 alpha.
 
-    if (quadrantNumber ==  1) { // If in the first quadrant.
-      for (int loc = 0; loc < numberOfParticleSteps; loc++) { // For all the steps in the particle.
-        newPo210Alpha.xMovementPath[loc] = pgm_read_word(&(xMPPFQ1Po210[pathNumber][loc])); // Fills the x movement array from PROGMEM.
-        newPo210Alpha.yMovementPath[loc] = pgm_read_word(&(yMPPFQ1Po210[pathNumber][loc])); // Fills the y movement array from PROGMEM.
-      }
-      newPo210Alpha.energy = Po210alphaEnergy; // Sets the energy.
-      newPo210Alpha.movementLocation = arrayStartLocation; // Sets the start location for the movement path.
+  if (quadrantNumber ==  1) { // If in the first quadrant.
+    for (int loc = 0; loc < numberOfParticleSteps; loc++) { // For all the steps in the particle.
+      newPo210Alpha.xMovementPath[loc] = pgm_read_word(&(xMPPFQ1Po210[pathNumber][loc])); // Fills the x movement array from PROGMEM.
+      newPo210Alpha.yMovementPath[loc] = pgm_read_word(&(yMPPFQ1Po210[pathNumber][loc])); // Fills the y movement array from PROGMEM.
     }
-    else if (quadrantNumber ==  2) { // If in the quadrant quadrant.
-      for (int loc = 0; loc < numberOfParticleSteps; loc++) { // For all the steps in the particle.
-        newPo210Alpha.xMovementPath[loc] = -1 * pgm_read_word(&(xMPPFQ1Po210[pathNumber][loc])); // Fills the x movement array from PROGMEM.
-        newPo210Alpha.yMovementPath[loc] = pgm_read_word(&(yMPPFQ1Po210[pathNumber][loc])); // Fills the y movement array from PROGMEM.
-      }
-      newPo210Alpha.energy = Po210alphaEnergy; // Sets the energy.
-      newPo210Alpha.movementLocation = arrayStartLocation; // Sets the start location for the movement path.
+    newPo210Alpha.energy = Po210alphaEnergy; // Sets the energy.
+    newPo210Alpha.movementLocation = arrayStartLocation; // Sets the start location for the movement path.
+  }
+  else if (quadrantNumber ==  2) { // If in the quadrant quadrant.
+    for (int loc = 0; loc < numberOfParticleSteps; loc++) { // For all the steps in the particle.
+      newPo210Alpha.xMovementPath[loc] = -1 * pgm_read_word(&(xMPPFQ1Po210[pathNumber][loc])); // Fills the x movement array from PROGMEM.
+      newPo210Alpha.yMovementPath[loc] = pgm_read_word(&(yMPPFQ1Po210[pathNumber][loc])); // Fills the y movement array from PROGMEM.
     }
-    else if (quadrantNumber ==  3) { // If in the third quadrant.
-      for (int loc = 0; loc < numberOfParticleSteps; loc++) { // For all the steps in the particle.
-        newPo210Alpha.xMovementPath[loc] = -1 * pgm_read_word(&(xMPPFQ1Po210[pathNumber][loc])); // Fills the x movement array from PROGMEM.
-        newPo210Alpha.yMovementPath[loc] = -1 * pgm_read_word(&(yMPPFQ1Po210[pathNumber][loc])); // Fills the y movement array from PROGMEM.
-      }
-      newPo210Alpha.energy = Po210alphaEnergy; // Sets the energy.
-      newPo210Alpha.movementLocation = arrayStartLocation; // Sets the start location for the movement path.
+    newPo210Alpha.energy = Po210alphaEnergy; // Sets the energy.
+    newPo210Alpha.movementLocation = arrayStartLocation; // Sets the start location for the movement path.
+  }
+  else if (quadrantNumber ==  3) { // If in the third quadrant.
+    for (int loc = 0; loc < numberOfParticleSteps; loc++) { // For all the steps in the particle.
+      newPo210Alpha.xMovementPath[loc] = -1 * pgm_read_word(&(xMPPFQ1Po210[pathNumber][loc])); // Fills the x movement array from PROGMEM.
+      newPo210Alpha.yMovementPath[loc] = -1 * pgm_read_word(&(yMPPFQ1Po210[pathNumber][loc])); // Fills the y movement array from PROGMEM.
     }
-    else if (quadrantNumber ==  4) { // If in the fourth quadrant.
-      for (int loc = 0; loc < numberOfParticleSteps; loc++) { // For all the steps in the particle.
-        newPo210Alpha.xMovementPath[loc] = pgm_read_word(&(xMPPFQ1Po210[pathNumber][loc])); // Fills the x movement array from PROGMEM.
-        newPo210Alpha.yMovementPath[loc] = -1 * pgm_read_word(&(yMPPFQ1Po210[pathNumber][loc])); // Fills the y movement array from PROGMEM.
-      }
-      newPo210Alpha.energy = Po210alphaEnergy; // Sets the energy.
-      newPo210Alpha.movementLocation = arrayStartLocation; // Sets the start location for the movement path.
+    newPo210Alpha.energy = Po210alphaEnergy; // Sets the energy.
+    newPo210Alpha.movementLocation = arrayStartLocation; // Sets the start location for the movement path.
+  }
+  else if (quadrantNumber ==  4) { // If in the fourth quadrant.
+    for (int loc = 0; loc < numberOfParticleSteps; loc++) { // For all the steps in the particle.
+      newPo210Alpha.xMovementPath[loc] = pgm_read_word(&(xMPPFQ1Po210[pathNumber][loc])); // Fills the x movement array from PROGMEM.
+      newPo210Alpha.yMovementPath[loc] = -1 * pgm_read_word(&(yMPPFQ1Po210[pathNumber][loc])); // Fills the y movement array from PROGMEM.
     }
+    newPo210Alpha.energy = Po210alphaEnergy; // Sets the energy.
+    newPo210Alpha.movementLocation = arrayStartLocation; // Sets the start location for the movement path.
+  }
   return newPo210Alpha; // Returns this new alpha.
 }
 
@@ -150,38 +150,38 @@ Alpha createNewRn222Alpha() {
 
   Alpha newRn222Alpha; // Creates a new Rn 222 alpha.
 
-    if (quadrantNumber ==  1) { // If in the first quadrant.
-      for (int loc = 0; loc < numberOfParticleSteps; loc++) { // For all the steps in the particle.
-        newRn222Alpha.xMovementPath[loc] = pgm_read_word(&(xMPPFQ1Rn222[pathNumber][loc])); // Fills the x movement array from PROGMEM.
-        newRn222Alpha.yMovementPath[loc] = pgm_read_word(&(yMPPFQ1Rn222[pathNumber][loc])); // Fills the y movement array from PROGMEM.
-      }
-      newRn222Alpha.energy = Rn222alphaEnergy; // Sets the energy.
-      newRn222Alpha.movementLocation = arrayStartLocation; // Sets the start location for the movement path.
+  if (quadrantNumber ==  1) { // If in the first quadrant.
+    for (int loc = 0; loc < numberOfParticleSteps; loc++) { // For all the steps in the particle.
+      newRn222Alpha.xMovementPath[loc] = pgm_read_word(&(xMPPFQ1Rn222[pathNumber][loc])); // Fills the x movement array from PROGMEM.
+      newRn222Alpha.yMovementPath[loc] = pgm_read_word(&(yMPPFQ1Rn222[pathNumber][loc])); // Fills the y movement array from PROGMEM.
     }
-    else if (quadrantNumber ==  2) { // If in the second quadrant.
-      for (int loc = 0; loc < numberOfParticleSteps; loc++) { // For all the steps in the particle.
-        newRn222Alpha.xMovementPath[loc] = -1 * pgm_read_word(&(xMPPFQ1Rn222[pathNumber][loc])); // Fills the x movement array from PROGMEM.
-        newRn222Alpha.yMovementPath[loc] = pgm_read_word(&(yMPPFQ1Rn222[pathNumber][loc])); // Fills the y movement array from PROGMEM.
-      }
-      newRn222Alpha.energy = Rn222alphaEnergy; // Sets the energy.
-      newRn222Alpha.movementLocation = arrayStartLocation; // Sets the start location for the movement path.
+    newRn222Alpha.energy = Rn222alphaEnergy; // Sets the energy.
+    newRn222Alpha.movementLocation = arrayStartLocation; // Sets the start location for the movement path.
+  }
+  else if (quadrantNumber ==  2) { // If in the second quadrant.
+    for (int loc = 0; loc < numberOfParticleSteps; loc++) { // For all the steps in the particle.
+      newRn222Alpha.xMovementPath[loc] = -1 * pgm_read_word(&(xMPPFQ1Rn222[pathNumber][loc])); // Fills the x movement array from PROGMEM.
+      newRn222Alpha.yMovementPath[loc] = pgm_read_word(&(yMPPFQ1Rn222[pathNumber][loc])); // Fills the y movement array from PROGMEM.
     }
-    else if (quadrantNumber ==  3) { // If in the third quadrant.
-      for (int loc = 0; loc < numberOfParticleSteps; loc++) { // For all the steps in the particle.
-        newRn222Alpha.xMovementPath[loc] = -1 * pgm_read_word(&(xMPPFQ1Rn222[pathNumber][loc])); // Fills the x movement array from PROGMEM.
-        newRn222Alpha.yMovementPath[loc] = -1 * pgm_read_word(&(yMPPFQ1Rn222[pathNumber][loc])); // Fills the y movement array from PROGMEM.
-      }
-      newRn222Alpha.energy = Rn222alphaEnergy; // Sets the energy.
-      newRn222Alpha.movementLocation = arrayStartLocation; // Sets the start location for the movement path.
+    newRn222Alpha.energy = Rn222alphaEnergy; // Sets the energy.
+    newRn222Alpha.movementLocation = arrayStartLocation; // Sets the start location for the movement path.
+  }
+  else if (quadrantNumber ==  3) { // If in the third quadrant.
+    for (int loc = 0; loc < numberOfParticleSteps; loc++) { // For all the steps in the particle.
+      newRn222Alpha.xMovementPath[loc] = -1 * pgm_read_word(&(xMPPFQ1Rn222[pathNumber][loc])); // Fills the x movement array from PROGMEM.
+      newRn222Alpha.yMovementPath[loc] = -1 * pgm_read_word(&(yMPPFQ1Rn222[pathNumber][loc])); // Fills the y movement array from PROGMEM.
     }
-    else if (quadrantNumber ==  4) { // If in the fourth quadrant.
-      for (int loc = 0; loc < numberOfParticleSteps; loc++) { // For all the steps in the particle.
-        newRn222Alpha.xMovementPath[loc] = pgm_read_word(&(xMPPFQ1Rn222[pathNumber][loc])); // Fills the x movement array from PROGMEM.
-        newRn222Alpha.yMovementPath[loc] = -1 * pgm_read_word(&(yMPPFQ1Rn222[pathNumber][loc])); // Fills the y movement array from PROGMEM.
-      }
-      newRn222Alpha.energy = Rn222alphaEnergy; // Sets the energy.
-      newRn222Alpha.movementLocation = arrayStartLocation; // Sets the start location for the movement path.
+    newRn222Alpha.energy = Rn222alphaEnergy; // Sets the energy.
+    newRn222Alpha.movementLocation = arrayStartLocation; // Sets the start location for the movement path.
+  }
+  else if (quadrantNumber ==  4) { // If in the fourth quadrant.
+    for (int loc = 0; loc < numberOfParticleSteps; loc++) { // For all the steps in the particle.
+      newRn222Alpha.xMovementPath[loc] = pgm_read_word(&(xMPPFQ1Rn222[pathNumber][loc])); // Fills the x movement array from PROGMEM.
+      newRn222Alpha.yMovementPath[loc] = -1 * pgm_read_word(&(yMPPFQ1Rn222[pathNumber][loc])); // Fills the y movement array from PROGMEM.
     }
+    newRn222Alpha.energy = Rn222alphaEnergy; // Sets the energy.
+    newRn222Alpha.movementLocation = arrayStartLocation; // Sets the start location for the movement path.
+  }
   return newRn222Alpha; // Returns this new Rn 222 alpha.
 }
 
@@ -218,18 +218,21 @@ Alpha computeNextPo210AlphaLocation(Alpha Po210Alpha) {
     return Po210Alpha; // Returns this new alpha.
   }
   else { // If the alpha has left the detector or has no more energy...
-    Po210AlphaDone = true;
-    Alpha newPo210Alpha = createNewPo210Alpha(); // Create a new alpha.
-    while (checkAlphaElectronDist() == false) { // While theres an electron that is not at the center of the detector.
+    if (checkAlphaElectronDist() == false) {
       displayDetector(); // Displays the detector.
       for (int loc = 0; loc < numElectronLocationsInArray; loc++) // For every position in the array...
         alphaElectrons[loc] = computeNextElectronLocation(alphaElectrons[loc]); // Computes and moves the electon through its current step.
+      return Po210Alpha;
     }
-    return newPo210Alpha; // Returns the new alpha so that the infinite loop can be continued.
+    else {
+      Po210AlphaDone = true;
+      Alpha newPo210Alpha = createNewPo210Alpha(); // Create a new cosmic ray.
+      return newPo210Alpha; // Returns the new alpha so that the infinite loop can be continued.
+    }
   }
 }
 
-/* Alpha computeNextAlphaLocation(Alpha alpha)
+/* Alpha computeNextRn222AlphaLocation(Alpha alpha)
 
    Determines the next location for which a given alpha will move along with determining if an electron should appear and controlling said electrons.
 
@@ -237,7 +240,7 @@ Alpha computeNextPo210AlphaLocation(Alpha Po210Alpha) {
 Alpha computeNextRn222AlphaLocation(Alpha Rn222Alpha) {
   int energyChangeLowerBounds = 300; // The smallest energy value the alpha can "lose" to an electron. Default is 300 keV.
   int energyChangeUpperBounds = 400; // The largest energy value the alpha can "lose" to an electron. Default is 400 keV.
-  
+
   randomSeed(0); // Randomizes the seed.
 
   int xCurrent = Rn222Alpha.xMovementPath[Rn222Alpha.movementLocation]; // Saves the passed in xLocation, yLocation, and energy values.
@@ -262,15 +265,17 @@ Alpha computeNextRn222AlphaLocation(Alpha Rn222Alpha) {
     return Rn222Alpha; // Returns this new alpha.
   }
   else { // If the alpha has left the detector or has no more energy...
-    Rn222AlphaDone = true;
-    Alpha newRn222Alpha = createNewRn222Alpha(); // Create a new alpha.
-
-    while (checkAlphaElectronDist() == false) { // While theres an electron that is not at the center of the detector.
+    if (checkAlphaElectronDist() == false) {
       displayDetector(); // Displays the detector.
       for (int loc = 0; loc < numElectronLocationsInArray; loc++) // For every position in the array...
         alphaElectrons[loc] = computeNextElectronLocation(alphaElectrons[loc]); // Computes and moves the electon through its current step.
+      return Rn222Alpha;
     }
-    return newRn222Alpha; // Returns the new alpha so that the infinite loop can be continued.
+    else {
+      Rn222AlphaDone = true;
+      Alpha newRn222Alpha = createNewRn222Alpha(); // Create a new cosmic ray.
+      return newRn222Alpha; // Returns the new alpha so that the infinite loop can be continued.
+    }
   }
 }
 

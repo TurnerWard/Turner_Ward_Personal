@@ -116,15 +116,17 @@ CosmicRay computeNextCosmicRayLocation(CosmicRay cosmicray) {
     return cosmicray; // Returns this new cosmic ray.
   }
   else { // If the cosmic ray has left the detector or has no more energy...
-    cosmicrayDone = true;
-    CosmicRay newCosmicRay = createNewCosmicRay(); // Create a new cosmic ray.
-
-    while (checkCosmicElectronDist() == false) { // While the cosmic rays are not at the center of the detector.
+   if (checkCosmicElectronDist() == false) {
       displayDetector(); // Displays the detector.
       for (int loc = 0; loc < numElectronLocationsInArray; loc++) // For every position in the array...
         cosmicElectrons[loc] = computeNextElectronLocation(cosmicElectrons[loc]); // Computes and moves the electon through its current step.
+      return cosmicray;
     }
-    return newCosmicRay; // Returns the new alpha so that the infinite loop can be continued.
+    else {
+      cosmicrayDone = true;
+      CosmicRay newCosmicRay = createNewCosmicRay(); // Create a new cosmic ray.
+      return newCosmicRay; // Returns the new alpha so that the infinite loop can be continued.
+    }
   }
 }
 
