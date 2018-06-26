@@ -31,7 +31,7 @@ Arduino code to control a DAC that controls the galvo system motors to display t
 	-> Alpha{int xMovementPath[11], int yMovementPath[11], energy, movementLocation}
 
 #### Important Variables:
-	##### The following four variables are the alpha particles movement libraries used for movement.
+##### The following four variables are the alpha particles movement libraries used for movement.
 	-> const int xMPPFQ1Po210[6][11] PROGMEM = ...
 	-> const int yMPPFQ1Po210[6][11] PROGMEM = ...
 	-> const int xMPPFQ1Rn222[6][11] PROGMEM = ...
@@ -61,7 +61,7 @@ Arduino code to control a DAC that controls the galvo system motors to display t
 	-> CosmicRay{int xMovementPath[11], int yMovementPath[11], energy, movementLocation}
 
 #### Important Variables:
-	##### The following four variables are the cosmic rays particles movement libraries used for movement.
+##### The following two variables are the cosmic rays particles movement libraries used for movement.
 	-> const int xMPPFQ1Muon[6][11] PROGMEM = ...
 	-> const int yMPPFQ1Muon[6][11] PROGMEM = ...
 
@@ -89,10 +89,10 @@ Arduino code to control a DAC that controls the galvo system motors to display t
 	-> PointLikeParticle{int xMovementPath[11], int yMovementPath[11], energy, movementLocation}
 
 #### Important Variables:
-	##### The following four variables are the point like particles movement libraries used for movement.
+##### The following three variables are the point like particles movement and energy libraries used for movement.
 	-> const int xMPPFQ1PointLikeParticle[7][11] PROGMEM = ...
 	-> const int yMPPFQ1PointLikeParticle[7][11] PROGMEM = ...
-	-> const int PointLikeParticleEnergy[11] PROGMEM = ...
+	-> const int PointLikeParticleEnergy[7] PROGMEM = ...
 
 #### Functions:	
 |**Name and Arguments** | **Description**                                          				    |

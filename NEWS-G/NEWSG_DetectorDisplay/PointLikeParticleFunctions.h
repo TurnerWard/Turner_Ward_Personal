@@ -40,7 +40,7 @@ const int yMPPFQ1PointLikeParticle[7][11] PROGMEM = { // Note: This array is sto
 };
 
 // An array containing 7 different energies that corresponds to the different paths displayed above.
-const int PointLikeParticleEnergy[11] PROGMEM = {2200, 800, 1000, 1800, 2000, 1600, 1200};
+const int PointLikeParticleEnergy[7] PROGMEM = {2200, 800, 1000, 1800, 2000, 1600, 1200};
 
 /* bool checkPointLikeParticleElectronDist()
 
