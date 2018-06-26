@@ -70,7 +70,7 @@ const int yMPPFQ1Rn222[6][11] PROGMEM = { // Note: This array is stored in flash
 */
 bool checkAlphaElectronDist() {
   for (int loc = 0; loc < numElectronLocationsInArray; loc++) {
-    if (alphaElectrons[loc].rLocation > 20) {
+    if (alphaElectrons[loc].rLocation < 2048) {
       return false;
     }
   }

@@ -46,7 +46,7 @@ const int yMPPFQ1Muon[6][11] PROGMEM = { // Note: This array is stored in flash 
 */
 bool checkCosmicElectronDist() {
   for (int loc = 0; loc < numElectronLocationsInArray; loc++) { // For each variable in the electron array.
-    if (cosmicElectrons[loc].rLocation > 20) // Check to see if the radial location is greater then 20.
+    if (cosmicElectrons[loc].rLocation < 2048) // Check to see if the radial location is greater then 20.
       return false; // If one of the radial distances is over 20 return false and keep the electrons drifting towards the center of the circle.
   }
   return true; // If all electrons are within a radial distance of 20 then return true and stop the electrons from drifting within the detector.
