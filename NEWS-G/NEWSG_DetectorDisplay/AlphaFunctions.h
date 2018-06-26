@@ -17,7 +17,9 @@ typedef struct Alpha {
 } Alpha;
 
 // Variable declaration.
-Electron alphaElectrons[11]; // Creates an array of 11 electrons. The value within the array needs to be equal to that of the numElectronLocationInArray variable.
+Electron Po210AlphaElectrons[11]; // Creates an array of 11 Po 210 electrons. The value within the array needs to be equal to that of the numElectronLocationInArray variable.
+Electron Rn222AlphaElectrons[11]; // Creates an array of 11 Rn 222 electrons. The value within the array needs to be equal to that of the numElectronLocationInArray variable.
+
 Alpha computeNextRn222AlphaLocation(Alpha Rn222Alpha);
 Alpha po210alpha1; // Two different Alpha particles - one is from Po 210, one is from Rn 222.
 Alpha rn222alpha1;
@@ -62,15 +64,30 @@ const int yMPPFQ1Rn222[6][11] PROGMEM = { // Note: This array is stored in flash
   {160, 230, 303, 397, 463, 530, 604, 693, 782, 867, 938} // 5
 };
 
-/* bool checkAlphaElectronDist()
+/* bool checkPo210AlphaElectronDist()
 
     Returns false if the electrons have a distance greater then the specified distance away from the center of the detector. If all the electrons are within the specified distance
     from the center of the detector return true.
 
 */
-bool checkAlphaElectronDist() {
+bool checkPo210AlphaElectronDist() {
   for (int loc = 0; loc < numElectronLocationsInArray; loc++) {
-    if (alphaElectrons[loc].rLocation < 2048) {
+    if (Po210AlphaElectrons[loc].rLocation < 2048) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/* bool checkRn222AlphaElectronDist()
+
+    Returns false if the electrons have a distance greater then the specified distance away from the center of the detector. If all the electrons are within the specified distance
+    from the center of the detector return true.
+
+*/
+bool checkRn222AlphaElectronDist() {
+  for (int loc = 0; loc < numElectronLocationsInArray; loc++) {
+    if (Rn222AlphaElectrons[loc].rLocation < 2048) {
       return false;
     }
   }
@@ -202,15 +219,15 @@ Alpha computeNextPo210AlphaLocation(Alpha Po210Alpha) {
 
   if (Po210Alpha.movementLocation < numberOfParticleSteps) { // If the alpha can exist.
     int energyChange = random(energyChangeLowerBounds, energyChangeUpperBounds); // Calculates the energy change that the electron will gain if created in keV.
-    alphaElectrons[alphaElectronLocation] = generateElectron(xCurrent, yCurrent, energyChange); // Generates an electron and saves it.
+    Po210AlphaElectrons[Po210AlphaElectronLocation] = generateElectron(xCurrent, yCurrent, energyChange); // Generates an electron and saves it.
     energyCurrent = energyCurrent - energyChange; // Lowers the energy of the alpha.
-    alphaElectronLocation++; // Increases the count for which the next electron will be added into the array.
+    Po210AlphaElectronLocation++; // Increases the count for which the next electron will be added into the array.
 
-    if (alphaElectronLocation == numElectronLocationsInArray) // If the array is filled rotate around and start filling it again.
-      alphaElectronLocation = 0; // Resets the array position counter to 0.
+    if (Po210AlphaElectronLocation == numElectronLocationsInArray) // If the array is filled rotate around and start filling it again.
+      Po210AlphaElectronLocation = 0; // Resets the array position counter to 0.
 
     for (int loc = 0; loc < numElectronLocationsInArray; loc++)  // For every position in the array...
-      alphaElectrons[loc] = computeNextElectronLocation(alphaElectrons[loc]); // Computes and moves the electon through its current step.
+      Po210AlphaElectrons[loc] = computeNextElectronLocation(Po210AlphaElectrons[loc]); // Computes and moves the electon through its current step.
 
     simulateTrack(energyCurrent, xCurrent, yCurrent); // Updates the alphas position.
     Po210Alpha.energy = energyCurrent; // Updates the alphas energy.
@@ -218,10 +235,10 @@ Alpha computeNextPo210AlphaLocation(Alpha Po210Alpha) {
     return Po210Alpha; // Returns this new alpha.
   }
   else { // If the alpha has left the detector or has no more energy...
-    if (checkAlphaElectronDist() == false) {
+    if (checkPo210AlphaElectronDist() == false) {
       displayDetector(); // Displays the detector.
       for (int loc = 0; loc < numElectronLocationsInArray; loc++) // For every position in the array...
-        alphaElectrons[loc] = computeNextElectronLocation(alphaElectrons[loc]); // Computes and moves the electon through its current step.
+        Po210AlphaElectrons[loc] = computeNextElectronLocation(Po210AlphaElectrons[loc]); // Computes and moves the electon through its current step.
       return Po210Alpha;
     }
     else {
@@ -249,15 +266,15 @@ Alpha computeNextRn222AlphaLocation(Alpha Rn222Alpha) {
 
   if (Rn222Alpha.movementLocation < numberOfParticleSteps) { // If the alpha can exist.
     int energyChange = random(energyChangeLowerBounds, energyChangeUpperBounds); // Calculates the energy change that the electron will gain if created in keV.
-    alphaElectrons[alphaElectronLocation] = generateElectron(xCurrent, yCurrent, energyChange); // Generates an electron and saves it.
+    Rn222AlphaElectrons[Rn222AlphaElectronLocation] = generateElectron(xCurrent, yCurrent, energyChange); // Generates an electron and saves it.
     energyCurrent = energyCurrent - energyChange; // Lowers the energy of the alpha.
-    alphaElectronLocation++; // Increases the count for which the next electron will be added into the array.
+    Rn222AlphaElectronLocation++; // Increases the count for which the next electron will be added into the array.
 
-    if (alphaElectronLocation == numElectronLocationsInArray) // If the array is filled rotate around and start filling it again.
-      alphaElectronLocation = 0; // Resets the array position counter to 0.
+    if (Rn222AlphaElectronLocation == numElectronLocationsInArray) // If the array is filled rotate around and start filling it again.
+      Rn222AlphaElectronLocation = 0; // Resets the array position counter to 0.
 
     for (int loc = 0; loc < numElectronLocationsInArray; loc++)  // For every position in the array...
-      alphaElectrons[loc] = computeNextElectronLocation(alphaElectrons[loc]); // Computes and moves the electon through its current step.
+      Rn222AlphaElectrons[loc] = computeNextElectronLocation(Rn222AlphaElectrons[loc]); // Computes and moves the electon through its current step.
 
     simulateTrack(energyCurrent, xCurrent, yCurrent); // Updates the alphas position.
     Rn222Alpha.energy = energyCurrent; // Updates the energy of the alpha.
@@ -265,10 +282,10 @@ Alpha computeNextRn222AlphaLocation(Alpha Rn222Alpha) {
     return Rn222Alpha; // Returns this new alpha.
   }
   else { // If the alpha has left the detector or has no more energy...
-    if (checkAlphaElectronDist() == false) {
+    if (checkRn222AlphaElectronDist() == false) {
       displayDetector(); // Displays the detector.
       for (int loc = 0; loc < numElectronLocationsInArray; loc++) // For every position in the array...
-        alphaElectrons[loc] = computeNextElectronLocation(alphaElectrons[loc]); // Computes and moves the electon through its current step.
+        Rn222AlphaElectrons[loc] = computeNextElectronLocation(Rn222AlphaElectrons[loc]); // Computes and moves the electon through its current step.
       return Rn222Alpha;
     }
     else {

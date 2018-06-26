@@ -39,8 +39,8 @@ Electron computeNextElectronLocation(Electron electron) {
   int rMovementLowerBounds = 10; // The smallest step an electron can move after appearing. Default is 10.
   int rMovementUpperBounds = 10; // The largest step an electron can move after appearing. Default is 50.
   int thetaMovementBounds = 5; // The maximum angle in degrees for which the electron can move in one step. Default is 5.
-  int energyChangeLowerBounds = 0; // The minimum energy that an electron can lose in 1 interaction in keV. Default is 1.
-  int energyChangeUpperBounds = 0; // The maximum energy that an electron can lose in 1 interaction in keV. Default is 5.
+  int energyChangeLowerBounds = 0; // The minimum energy that an electron can lose in 1 interaction in keV. Default is 0. | If both this and the upper bounds is 0 then no energy will
+  int energyChangeUpperBounds = 0; // The maximum energy that an electron can lose in 1 interaction in keV. Default is 5. | be lost and all electrons will reach the detectors center.
 
   const int maxSINCOSvalue = 16384; // The largest value that can be returned from the SIN and COS functions as declared in Basics.cpp. This should remain 16384.
 
@@ -74,8 +74,8 @@ Electron computeNextElectronLocation(Electron electron) {
       simulateTrack(energyCurrent, rCurrent * COS(thetaCurrent) / maxSINCOSvalue, rCurrent * SIN(thetaCurrent) / maxSINCOSvalue); // Displays the electron.
       Electron newElectron;
       if (rCurrent < 0)
-        newElectron = {rCurrent, random(0,361), energyCurrent, true}; // Creates the new elecron which will act as an ion with the new values.
-      else
+        newElectron = {rCurrent, random(0,361), energyCurrent, true}; // Creates the new elecron which will act as an ion with the new values. Note these ions are generated with
+      else                                                            // random values currently but even spacing could be implimented if wanted.
         newElectron = {rCurrent, thetaCurrent, energyCurrent, false}; // Creates the new elecron with the new values.
       return newElectron; // Returns this new electron.
     }
