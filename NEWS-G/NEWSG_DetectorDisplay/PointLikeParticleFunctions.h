@@ -125,7 +125,7 @@ PointLikeParticle computeNextPointLikeParticleLocation(PointLikeParticle pointli
   int energyCurrent = pointlikeparticle.energy;
 
   if (pointlikeparticle.movementLocation == numberOfParticleSteps - 1) { // If the particle has reached its last step location.
-    int xFinal = pointlikeparticle.xMovementPath[pointlikeparticle.movementLocation - 1]; Saves the last passed in locations.
+    int xFinal = pointlikeparticle.xMovementPath[pointlikeparticle.movementLocation - 1]; //Saves the last passed in locations.
     int yFinal = pointlikeparticle.yMovementPath[pointlikeparticle.movementLocation - 1];
     for (int loc = 0; loc < pointlikeparticle.energy / 200; loc++) // Creates a number of electrons based on the energy of the point like particle.
       pointlikeparticlesElectrons[loc] = generateElectron(xFinal, yFinal, pointlikeparticle.energy / 5); // Generates an electron and saves it.
