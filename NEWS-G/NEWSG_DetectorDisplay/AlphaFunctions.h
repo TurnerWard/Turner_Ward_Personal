@@ -7,8 +7,8 @@
 
 // Creates an Alpha struct. An alpha is made up of an array of x locations, an array of y locations, an energy, and a variable to track where in the movement path the particle is.
 typedef struct Alpha {
-  int xMovementPath[11];
-  int yMovementPath[11];
+  int xMovementPath[11]; //xMovementPath[11];
+  int yMovementPath[11]; //yMovementPath[11];
   int energy;
   int movementLocation;
 } Alpha;

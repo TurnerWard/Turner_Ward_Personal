@@ -74,6 +74,7 @@ CosmicRay createNewCosmicRay() {
     for (int loc = 0; loc < numberOfParticleSteps; loc++) { // For each step for the particle.
       newCosmicRay.xMovementPath[loc] = pgm_read_word(&(xMPPFQ1Muon[pathNumber][loc])); // Fills the x movement array from PROGMEM.
       newCosmicRay.yMovementPath[loc] = pgm_read_word(&(yMPPFQ1Muon[pathNumber][loc])); // Fills the y movement array from PROGMEM.
+      Serial.println(newCosmicRay.xMovementPath[loc]);
     }
     newCosmicRay.energy = cosmicrayEnergy; // Enters the cosmic rays energy.
     newCosmicRay.movementLocation = arrayStartLocation; // Sets the arrays start location.
@@ -86,6 +87,7 @@ CosmicRay createNewCosmicRay() {
     newCosmicRay.energy = cosmicrayEnergy; // Enters the cosmic rays energy.
     newCosmicRay.movementLocation = arrayStartLocation; // Sets the arrays start location.
   }
+  Serial.println(sizeof(newCosmicRay.xMovementPath)/sizeof(int));
   return newCosmicRay; // Returns this new cosmic ray.
 }
 
