@@ -102,8 +102,7 @@ Arduino code to control a DAC that controls the galvo system motors to display t
 |PointLikeParticle computeNextPointLikeParticleLocation(PointLikeParticle pointlikeparticle) | Moves the point like particle to the next location in its movement array while creating electrons, reducing its energy, and drifting the already generated electrons and eventually ions. This function is in charge of facilitating the point like particles electron and ion drift until the ions leave the detector.	|
 
 ### NEXT STEPS
-#### 
--> Add in multiple laser colours (the difficult part here would be determining how to have the lasers at the same angle. Need a semi-transparent mirror.)
--> Creating a more finalized control panel by getting or creating a button console location.
--> Moving all/most components into a box and securing the components.
+#### -> Add in multiple laser colours (the difficult part here would be determining how to have the lasers at the same angle. Need a semi-transparent mirror.)
+#### -> Creating a more finalized control panel by getting or creating a button console location.
+#### -> Moving all/most components into a box and securing the components.
 
