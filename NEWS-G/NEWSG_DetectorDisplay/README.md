@@ -1,6 +1,11 @@
 # NEWS-G Galvo System Controller for the Detector Display
 Arduino code to control a DAC that controls the galvo system motors to display the detector and represent particles.
 
+There are some variables that may be adjusted if the program is not operating as desired. If these variables are global they should be able to be found at the top of the header files they reside in. If the variables are not global they will be found at the top of the function they reside in.
+
+Due to the large size of the code needed to control the galvo system in the desired method it should be noted that the arduinos dynamic memory and program storage space are getting quite full. If very large changes are planned to be made external ram, more program space, or a change of controller should be considered.
+
+
 ## Code Documentation
 
 ### Arduino Standard

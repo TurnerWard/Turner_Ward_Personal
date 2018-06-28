@@ -50,7 +50,7 @@ const int PointLikeParticleEnergy[7] PROGMEM = {2200, 800, 1000, 1800, 2000, 160
 */
 bool checkPointLikeParticleElectronDist() {
   for (int loc = 0; loc < numElectronLocationsInArray; loc++) { // For each variable in the electron array.
-    if (pointlikeparticlesElectrons[loc].rLocation < 2048) // Check to see if the radial location is smaller then 2048.
+    if (pointlikeparticlesElectrons[loc].rLocation < maxDisplayValue) // Check to see if the radial location is smaller then 2048.
       return false; // If one of the radial distances is smaller then 2048 then return false and keep the electrons drifting towards the center of the circle or ions outwards.
   }
   return true; // If all electrons are outside the detector or jabe a radial distance over 2048 then return true and stop the electrons and ions from drifting within the detector.

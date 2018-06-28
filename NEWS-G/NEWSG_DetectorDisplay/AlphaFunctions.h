@@ -7,8 +7,8 @@
 
 // Creates an Alpha struct. An alpha is made up of an array of x locations, an array of y locations, an energy, and a variable to track where in the movement path the particle is.
 typedef struct Alpha {
-  int xMovementPath[11]; //xMovementPath[11];
-  int yMovementPath[11]; //yMovementPath[11];
+  int xMovementPath[11];
+  int yMovementPath[11];
   int energy;
   int movementLocation;
 } Alpha;
@@ -69,7 +69,7 @@ const int yMPPFQ1Rn222[6][11] PROGMEM = { // Note: This array is stored in flash
 */
 bool checkPo210AlphaElectronDist() {
   for (int loc = 0; loc < numElectronLocationsInArray; loc++) { // For each electron in the array.
-    if (Po210AlphaElectrons[loc].rLocation < 2048) // Check to see if each one is within the detector.
+    if (Po210AlphaElectrons[loc].rLocation < maxDisplayValue) // Check to see if each one is within the detector.
       return false; // If at least one electron is within the detector then return false.
   }
   return true; // If every electron is outside the detector then return true.
@@ -83,7 +83,7 @@ bool checkPo210AlphaElectronDist() {
 */
 bool checkRn222AlphaElectronDist() {
   for (int loc = 0; loc < numElectronLocationsInArray; loc++) { // For each electron in the array.
-    if (Rn222AlphaElectrons[loc].rLocation < 2048) // Check to see if each one is within the detector.
+    if (Rn222AlphaElectrons[loc].rLocation < maxDisplayValue) // Check to see if each one is within the detector.
       return false; // If at least one electron is within the detector then return false.
   }
   return true; // If every electron is outside the detector then return true.
@@ -91,14 +91,14 @@ bool checkRn222AlphaElectronDist() {
 
 /* Alpha createNewPo210Alpha()
 
-   Creates a new Po210 Alpha particle with random properties.
+   Creates a new Po210 Alpha particle with "random" properties.
 
 */
 Alpha createNewPo210Alpha() {
   randomSeed(0); // Randomizes the seed. This in theory adds another layer of random to the code.
   int pathNumber = random(0, 6); // Picks a random number from 0 to 5.
   int quadrantNumber = random(1, 5); // Picks a random number between 1 to 4.
-  int Po210alphaEnergy = 5300; // Should be 5300. In keV.
+  int Po210alphaEnergy = 5300; // The energy of the Po 210 alpha, in keV.
   int arrayStartLocation = 0; // The array start location.
   const int maxSINCOSvalue = 16384; // The largest value that can be returned from the SIN and COS functions as declared in Basics.cpp. This should remain 16384.
 
@@ -114,7 +114,7 @@ Alpha createNewPo210Alpha() {
     newPo210Alpha.energy = Po210alphaEnergy; // Sets the energy value.
     newPo210Alpha.movementLocation = arrayStartLocation; // Sets the start location for the movement path.
   }
-  else if (quadrantNumber ==  2) { // If in the quadrant quadrant.
+  else if (quadrantNumber ==  2) { // If in the second quadrant.
     for (int loc = 0; loc < numberOfParticleSteps; loc++) { // For all the steps in the particle.
       newPo210Alpha.xMovementPath[loc] = -1 * pgm_read_word(&(xMPPFQ1Po210[pathNumber][loc])); // Flips and fills the x movement array from PROGMEM.
       newPo210Alpha.yMovementPath[loc] = pgm_read_word(&(yMPPFQ1Po210[pathNumber][loc])); // Fills the y movement array from PROGMEM.
@@ -150,7 +150,7 @@ Alpha createNewRn222Alpha() {
   randomSeed(0); // Randomizes the seed. This in theory adds another layer of random to the code.
   int pathNumber = random(0, 6); // Picks a random number from 0 to 5.
   int quadrantNumber = random(1, 5); // Picks a random number between 1 to 4.
-  int Rn222alphaEnergy = 5500; // Should be 5500. Stated in keV.
+  int Rn222alphaEnergy = 5500; // The start energy of the alpha, in keV.
   int arrayStartLocation = 0; // The array start location.
   const int maxSINCOSvalue = 16384; // The largest value that can be returned from the SIN and COS functions as declared in Basics.cpp. This should remain 16384.
 
@@ -219,7 +219,7 @@ Alpha computeNextPo210AlphaLocation(Alpha Po210Alpha) {
     for (int loc = 0; loc < numElectronLocationsInArray; loc++)  // For every position in the array...
       Po210AlphaElectrons[loc] = computeNextElectronLocation(Po210AlphaElectrons[loc]); // Computes and moves the electon through its current step.
 
-     if (delayTime != 0 ) {
+    if (delayTime != 0 ) {
       int currentTime = millis(); int enteredTime = millis();
       while (currentTime < enteredTime + delayTime) {
         currentTime = millis();
@@ -229,7 +229,7 @@ Alpha computeNextPo210AlphaLocation(Alpha Po210Alpha) {
     }
     else
       simulateTrack(energyCurrent, xCurrent, yCurrent); // Updates the Po 210 alphas position.
-      
+
     Po210Alpha.energy = energyCurrent; // Updates the alphas energy.
     Po210Alpha.movementLocation = Po210Alpha.movementLocation + 1; // Increases the alphas movemement location by 1 as we are now at the next location.
     return Po210Alpha; // Returns this new Po 210 alpha.
@@ -285,7 +285,7 @@ Alpha computeNextRn222AlphaLocation(Alpha Rn222Alpha) {
     }
     else
       simulateTrack(energyCurrent, xCurrent, yCurrent); // Updates the Rn 222 position.
-      
+
     Rn222Alpha.energy = energyCurrent; // Updates the energy of the Rn 222 alpha.
     Rn222Alpha.movementLocation = Rn222Alpha.movementLocation + 1; // Increases the alphas movemement location by 1 as we are now at the next location.
     return Rn222Alpha; // Returns this new alpha.
@@ -295,12 +295,12 @@ Alpha computeNextRn222AlphaLocation(Alpha Rn222Alpha) {
       displayDetector(); // Displays the detector.
       for (int loc = 0; loc < numElectronLocationsInArray; loc++) // For every position in the array.
         Rn222AlphaElectrons[loc] = computeNextElectronLocation(Rn222AlphaElectrons[loc]); // Computes and moves the electon through its current step.
-      return Rn222Alpha; // Return the Rn 222 alpha as the alpha hasnt been changed and will continue to enter this segment of the code allowing for multiple particles to be displayed
-                         // at once.
+      return Rn222Alpha; // Return the Rn 222 alpha as the alphas properties hasnt been changed and will continue to enter this segment of the code allowing for multiple
+      // particles to be displayed at once.
     }
     else {
       Rn222AlphaDone = true; // Sets the boolean variable for Rn 222 to true meaning the particle has finished tracking.
-      Alpha newRn222Alpha = createNewRn222Alpha(); // Create a new cosmic ray.
+      Alpha newRn222Alpha = createNewRn222Alpha(); // Create a new Rn 222.
       return newRn222Alpha; // Returns the new Rn 222 alpha so that the infinite loop can be continued.
     }
   }

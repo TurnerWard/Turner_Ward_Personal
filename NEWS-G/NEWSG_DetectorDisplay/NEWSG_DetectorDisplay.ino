@@ -50,31 +50,31 @@ void loop() {
 
 */
 void detectorBrain () {
-  if (Po210AlphaDone == false) { // If the Po 210 alpha has not completed its path...
+  if (Po210AlphaDone == false) { // If the Po 210 alpha has not yet completed its path...
     po210alpha1 = computeNextPo210AlphaLocation(po210alpha1); // Updates the Po 210 alphas location.
   }
   else if (Po210AlphaDone == true and digitalRead(Po210AlphaButtonPin) == HIGH) { // If the Po 210 alpha is done and the button has been pushed.
     Po210AlphaDone = false; // Allow for the Po 210 alpha to be displayed once again.
   }
 
-  if (Rn222AlphaDone == false) { // If the Rn222 alpha has not completed its path...
+  if (Rn222AlphaDone == false) { // If the Rn222 alpha has not yet completed its path...
     rn222alpha1 = computeNextRn222AlphaLocation(rn222alpha1); // Updates the Rn 222 alphas location.
   }
   else if (Rn222AlphaDone == true and digitalRead(Rn222AlphaButtonPin) == HIGH) { // If the Rn 222 alpha is done and the button has been pushed
     Rn222AlphaDone = false; // Allow for the Rn 222 alpha to be displayed once again.
   }
 
-  if (cosmicrayDone == false) { // If the cosmic ray has not completed its path...
-    cosmicray1 = computeNextCosmicRayLocation(cosmicray1); // Updates the cosmic ray next locations.
+  if (cosmicrayDone == false) { // If the cosmic ray has not yet completed its path...
+    cosmicray1 = computeNextCosmicRayLocation(cosmicray1); // Updates the cosmic ray next location.
   }
   else if (cosmicrayDone == true and digitalRead(CosmicRayButtonPin) == HIGH) { // If the cosmic ray is done and the button has been pushed.
     cosmicrayDone = false; // Allow for the cosmic ray to be displayed once again.
   }
 
-  if (pointlikeparticleDone == false) { // If the xray has not completed its path...
-    pointlikeparticle1 = computeNextPointLikeParticleLocation(pointlikeparticle1); // Updates the point like particles locations.
+  if (pointlikeparticleDone == false) { // If the point like particle has not yet completed its path...
+    pointlikeparticle1 = computeNextPointLikeParticleLocation(pointlikeparticle1); // Updates the point like particles location.
   }
-  else if (pointlikeparticleDone == true and digitalRead(PointLikeParticleButtonPin) == HIGH) { // If the point like particles is done and the button has been pushed.
+  else if (pointlikeparticleDone == true and digitalRead(PointLikeParticleButtonPin) == HIGH) { // If the point like particle is done and the button has been pushed.
     pointlikeparticleDone = false; // Allow for the point like particle to be displayed once again.
   }
 }

@@ -45,7 +45,7 @@ const int yMPPFQ1Muon[6][11] PROGMEM = { // Note: This array is stored in flash 
 */
 bool checkCosmicElectronDist() {
   for (int loc = 0; loc < numElectronLocationsInArray; loc++) { // For each variable in the electron array.
-    if (cosmicElectrons[loc].rLocation < 2048) // Check to see if the radial location is greater then 20.
+    if (cosmicElectrons[loc].rLocation < maxDisplayValue) // Check to see if the radial location is greater then 20.
       return false; // If one of the radial distances is under 2048 return false and keep the electrons drifting towards the center of the circle.
   }
   return true; // If all electrons are over a radial distance of 2048 then return true and stop the electrons from drifting within the detector.
@@ -96,8 +96,8 @@ CosmicRay createNewCosmicRay() {
 
 */
 CosmicRay computeNextCosmicRayLocation(CosmicRay cosmicray) {
-  int energyChangeLowerBounds = 300; // The smallest energy value the alpha can "lose" in one step to an electron or in general. Default is 300 keV.
-  int energyChangeUpperBounds = 400; // The largest energy value the alpha can "lose" in one step to an electron or in general. Default is 400 keV.
+  int energyChangeLowerBounds = 300; // The smallest energy value the cosmic ray can "lose" in one step to an electron or in general. Default is 300 keV.
+  int energyChangeUpperBounds = 400; // The largest energy value the cosmic ray can "lose" in one step to an electron or in general. Default is 400 keV.
 
   randomSeed(0); // Randomizes the seed.
   int xCurrent = cosmicray.xMovementPath[cosmicray.movementLocation]; // Saves the passed in xLocation, yLocation, and energy values.
@@ -107,7 +107,7 @@ CosmicRay computeNextCosmicRayLocation(CosmicRay cosmicray) {
   if (cosmicray.movementLocation < numberOfParticleSteps) { // If the cosmic ray still has path locations left within its array that havent yet been used.
     int energyChange = random(energyChangeLowerBounds, energyChangeUpperBounds); // Calculates the energy change that the electron will gain if created in keV.
     if (cosmicray.movementLocation % 2 == 0) { // Results in an electron being produced each second step.
-      cosmicElectrons[cosmicrayElectronLocation] = generateElectron(xCurrent, yCurrent, energyChange); // Generates an electron and saves it.
+      cosmicElectrons[cosmicrayElectronLocation] = generateElectron(xCurrent, yCurrent, energyChange); // Generates the electron and saves it.
       energyCurrent = energyCurrent - energyChange; // Lowers the energy of the cosmic ray.
       cosmicrayElectronLocation++; // Increases the count for which the next electron will be added into the array.
 
@@ -141,12 +141,13 @@ CosmicRay computeNextCosmicRayLocation(CosmicRay cosmicray) {
       displayDetector(); // Displays the detector.
       for (int loc = 0; loc < numElectronLocationsInArray; loc++) // For every position in the array...
         cosmicElectrons[loc] = computeNextElectronLocation(cosmicElectrons[loc]); // Computes and moves the electon through its current step.
-      return cosmicray; // Returns a nonupdated cosmic ray which allows for this segment of the code to be accessed again unless all the electrons and ions leabe the detector.
+      return cosmicray; // Returns a nonupdated cosmic ray which allows for this segment of the code to be accessed again immediatly afterwards unless all the electrons and 
+      // ions leave the detector.
     }
     else {
       cosmicrayDone = true; // Since the cosmic ray is now done set this boolean back to true.
       CosmicRay newCosmicRay = createNewCosmicRay(); // Create a new cosmic ray.
-      return newCosmicRay; // Returns the new alpha so that the infinite loop can be continued when a button is pressed.
+      return newCosmicRay; // Returns the new cosmic ray so that the infinite loop can be continued when a button is pressed.
     }
   }
 }
