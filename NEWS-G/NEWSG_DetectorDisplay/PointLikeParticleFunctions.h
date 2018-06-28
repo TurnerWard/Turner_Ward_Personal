@@ -137,7 +137,7 @@ PointLikeParticle computeNextPointLikeParticleLocation(PointLikeParticle pointli
       while (currentTime < enteredTime + delayTime) {
         currentTime = millis();
         simulateTrack(energyCurrent, xCurrent, yCurrent); // Updates the point like particles position.
-        displayDetector();
+        displayDetector(displayEnergyLevel);
       }
     }
     else
@@ -149,7 +149,7 @@ PointLikeParticle computeNextPointLikeParticleLocation(PointLikeParticle pointli
   }
   else { // If the cosmic ray has left the detector or has no more energy...
     if (checkPointLikeParticleElectronDist() == false) { // If the electrons or ions are still within the detector.
-      displayDetector(); // Displays the detector.
+      displayDetector(displayEnergyLevel); // Displays the detector.
       for (int loc = 0; loc < numElectronLocationsInArray; loc++) // For every position in the array...
         pointlikeparticlesElectrons[loc] = computeNextElectronLocation(pointlikeparticlesElectrons[loc]); // Computes and moves the electon through its current step.
       return pointlikeparticle; // Returns a nonupdated point like particle resulting in this segment of the code being called again until the electrons or ions have left the detector.

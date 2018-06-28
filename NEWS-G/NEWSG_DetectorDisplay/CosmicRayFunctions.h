@@ -45,7 +45,7 @@ const int yMPPFQ1Muon[6][11] PROGMEM = { // Note: This array is stored in flash 
 */
 bool checkCosmicElectronDist() {
   for (int loc = 0; loc < numElectronLocationsInArray; loc++) { // For each variable in the electron array.
-    if (cosmicElectrons[loc].rLocation < maxDisplayValue) // Check to see if the radial location is greater then 20.
+    if (cosmicElectrons[loc].rLocation < maxDisplayValue) // Check to see if the radial location is greater then 2048.
       return false; // If one of the radial distances is under 2048 return false and keep the electrons drifting towards the center of the circle.
   }
   return true; // If all electrons are over a radial distance of 2048 then return true and stop the electrons from drifting within the detector.
@@ -126,22 +126,27 @@ CosmicRay computeNextCosmicRayLocation(CosmicRay cosmicray) {
       while (currentTime < enteredTime + delayTime) {
         currentTime = millis();
         simulateTrack(energyCurrent, xCurrent, yCurrent); // Updates the cosmic rays position.
-        displayDetector();
+        displayDetector(displayEnergyLevel);
       }
     }
     else
       simulateTrack(energyCurrent, xCurrent, yCurrent); // Updates the cosmic rays position.
-      
+
     cosmicray.energy = energyCurrent; // Updates the cosmic rays energy.
     cosmicray.movementLocation = cosmicray.movementLocation + 1; // Updates the cosmic rays movement location by increasing it by 1.
     return cosmicray; // Returns this updated cosmic ray.
   }
   else { // If the cosmic ray has left the detector or has no more energy...
     if (checkCosmicElectronDist() == false) { // If all the electrons and ions are within the detector.
-      displayDetector(); // Displays the detector.
-      for (int loc = 0; loc < numElectronLocationsInArray; loc++) // For every position in the array...
+      displayDetector(displayEnergyLevel); // Displays the detector.
+      int numIons = 0;
+      for (int loc = 0; loc < numElectronLocationsInArray; loc++) { // For every position in the array...
         cosmicElectrons[loc] = computeNextElectronLocation(cosmicElectrons[loc]); // Computes and moves the electon through its current step.
-      return cosmicray; // Returns a nonupdated cosmic ray which allows for this segment of the code to be accessed again immediatly afterwards unless all the electrons and 
+        if (cosmicElectrons[loc].rLocation < 2048)
+          numIons = numIons + 1;
+        displayCurrentMeasured(numIons);
+      }
+      return cosmicray; // Returns a nonupdated cosmic ray which allows for this segment of the code to be accessed again immediatly afterwards unless all the electrons and
       // ions leave the detector.
     }
     else {

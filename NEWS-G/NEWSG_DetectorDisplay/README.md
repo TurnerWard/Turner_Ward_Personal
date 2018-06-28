@@ -115,7 +115,7 @@ Due to the large size of the code needed to control the galvo system in the desi
 ![Demo Video Link](https://github.com/TurnerWard/Turner_Ward_Personal/blob/master/NEWS-G/NEWSG_DetectorDisplay/NEWSG_DemoVideo_Final.MOV)
 
 ### NEXT STEPS
-#### -> Determine a way to slow down the particles speed when producing tracks. Adding more points doesnt seem to work due to memory on the arduino but there way be a different better way to acheive this.
+#### -> Display the current that is being produced by the ions as they drift.
 #### -> Add in multiple laser colours (the difficult part here would be determining how to have the lasers at the same angle. Need a semi-transparent mirror.)
 #### -> Creating a more finalized control panel by getting or creating a button console location.
 #### -> Moving all/most components into a box and securing the components.

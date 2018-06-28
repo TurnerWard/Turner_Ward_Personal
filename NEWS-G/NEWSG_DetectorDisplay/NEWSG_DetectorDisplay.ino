@@ -36,7 +36,7 @@ void setup() {
 
 // Loop.
 void loop() {
-  displayDetector(); // Displays the detector.
+  displayDetector(displayEnergyLevel); // Displays the detector.
   detectorBrain(); // Determines the particles that should be displayed and performs tasks.
 }
 
@@ -93,8 +93,15 @@ void initiateDisplay() {
   pinMode(PointLikeParticleButtonPin, INPUT);
 
   redlaser.init(); // Initiates the red laser which also initiates the dac.
-  redlaser.setScale(1); // Sets the scaling to be normal (no multiplication factor applied to the image) for the red laser.
-  redlaser.setOffset(2048, 2048); // Sets the offset for the laser so the circles center corresponds to (0,0) for the red laser.
+  
+  if(displayEnergyLevel == true) {
+  redlaser.setScale(0.80); // Sets the scaling to be normal (no multiplication factor applied to the image) for the red laser.
+  redlaser.setOffset(2048-400, 2048+400); // Sets the offset for the laser so the circles center corresponds to (0,0) for the red laser.
+  }
+  else {
+    redlaser.setScale(1); // Sets the scaling to be normal (no multiplication factor applied to the image) for the red laser.
+    redlaser.setOffset(2048, 2048); // Sets the offset for the laser so the circles center corresponds to (0,0) for the red laser.
+  }
 
   po210alpha1 = createNewPo210Alpha(); // Initiates the particles and creates new versions of each specific particle.
   rn222alpha1 = createNewRn222Alpha();

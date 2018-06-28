@@ -224,7 +224,7 @@ Alpha computeNextPo210AlphaLocation(Alpha Po210Alpha) {
       while (currentTime < enteredTime + delayTime) {
         currentTime = millis();
         simulateTrack(energyCurrent, xCurrent, yCurrent); // Updates the Po 210 alphas position.
-        displayDetector();
+        displayDetector(displayEnergyLevel);
       }
     }
     else
@@ -236,9 +236,15 @@ Alpha computeNextPo210AlphaLocation(Alpha Po210Alpha) {
   }
   else { // If the alpha has left the detector or has no more energy...
     if (checkPo210AlphaElectronDist() == false) { // If all the electrons and ions are still within the displayed detector.
-      displayDetector(); // Displays the detector.
-      for (int loc = 0; loc < numElectronLocationsInArray; loc++) // For every position in the array...
+      displayDetector(displayEnergyLevel); // Displays the detector.
+      int numIons = 0;
+      for (int loc = 0; loc < numElectronLocationsInArray; loc++) { // For every position in the array...
         Po210AlphaElectrons[loc] = computeNextElectronLocation(Po210AlphaElectrons[loc]); // Computes and moves the electon through its current step.
+        if (Po210AlphaElectrons[loc].rLocation < 2048)
+          numIons = numIons + 1;
+        Serial.println(numIons);
+        displayCurrentMeasured(numIons);
+      }
       return Po210Alpha; // Returns the Po 210 alpha which will continue to meet all the requirements to enter this section of the code as well.
     }
     else { // If all the electrons or ions are outside the displayed detector.
@@ -280,7 +286,7 @@ Alpha computeNextRn222AlphaLocation(Alpha Rn222Alpha) {
       while (currentTime < enteredTime + delayTime) {
         currentTime = millis();
         simulateTrack(energyCurrent, xCurrent, yCurrent); // Updates the Rn 222 position.
-        displayDetector();
+        displayDetector(displayEnergyLevel);
       }
     }
     else
@@ -292,9 +298,15 @@ Alpha computeNextRn222AlphaLocation(Alpha Rn222Alpha) {
   }
   else { // If the alpha has left the detector or has no more energy...
     if (checkRn222AlphaElectronDist() == false) { // If the electrons or ions are still within the detector then.
-      displayDetector(); // Displays the detector.
-      for (int loc = 0; loc < numElectronLocationsInArray; loc++) // For every position in the array.
+      displayDetector(displayEnergyLevel); // Displays the detector.
+      int numIons = 0;
+      for (int loc = 0; loc < numElectronLocationsInArray; loc++) { // For every position in the array...
         Rn222AlphaElectrons[loc] = computeNextElectronLocation(Rn222AlphaElectrons[loc]); // Computes and moves the electon through its current step.
+        if (Rn222AlphaElectrons[loc].rLocation < 2048)
+          numIons = numIons + 1;
+        Serial.println(numIons);
+        displayCurrentMeasured(numIons);
+      }
       return Rn222Alpha; // Return the Rn 222 alpha as the alphas properties hasnt been changed and will continue to enter this segment of the code allowing for multiple
       // particles to be displayed at once.
     }

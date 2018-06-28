@@ -6,6 +6,7 @@
 
 // Variable declaration.
 
+bool displayEnergyLevel = false;
 int delayTime = 10; // This changes the delay time as the partcles are moving across the screen. Setting this to 0 results in no delay. A delay of 10 (in ms) seems reasonable to me.
 
 Laser redlaser(5); // Initiates a red laser in the 5th arduino pin.
@@ -13,7 +14,7 @@ bool Po210AlphaDone = true, Rn222AlphaDone = true, cosmicrayDone = true, pointli
 int maxDisplayValue = 2048;
 int numElectronLocationsInArray = 11, numberOfParticleSteps = 11; // The number of electrons that can be tracked and  number of electron steps that are contained within the particle.
 int Po210AlphaElectronLocation = 0, Rn222AlphaElectronLocation = 0, cosmicrayElectronLocation = 0; // The current location for which an electron should be added into the array.
-
+void displayWireAndGraph();
 /* void simulateTrack(int energy, int xMiddlePoint, int yMiddlePoint)
 
    Simulates a track using a disk where the energy is represented as the size of the disk and the middle points of the disk can be specified.
@@ -35,7 +36,7 @@ void simulateTrack(int energy, int xMiddlePoint, int yMiddlePoint) {
    Displays the detector using a circle and a rod with the maximum resolution.
 
 */
-void displayDetector() {
+void displayDetector(bool displayEnergyLevel) {
   int circleStepSize = 20; // Changes the step size as the for loop passes through the circle. Smaller values create more perfect circles. Default is 15.
 
   redlaser.off(); // Makes sure the laser is off. This was needed to avoid fencing at this point.
@@ -44,11 +45,48 @@ void displayDetector() {
   redlaser.on(); // Now since we are in the correct location we can turn the laser on.
   for (int loc = 0; loc <= 360; loc += circleStepSize) // Rotates through the angles of the circle with the provided step size.
     redlaser.sendto(SIN(loc) / smallestSINCOSvalue, COS(loc) / smallestSINCOSvalue); // Displays the circle.
+
+  displayWireAndGraph();
+
   redlaser.off(); // After we have displayed the laser we can turn off the laser.
   redlaser.sendto(0, -2048); // Moves to the furthest bottom portion of the circle.
   redlaser.on();  // Turns on the laser.
   redlaser.sendto(0, 0); // Moves to the center of the circle which displays the rod.
   redlaser.off(); // Turns the laser off.
+}
+
+void displayWireAndGraph() {
+  if (displayEnergyLevel == true) {
+    redlaser.off();
+    redlaser.sendto(0, -2048);
+    redlaser.on();
+    redlaser.sendto(0, -2300);
+    redlaser.sendto(1000, -2300);
+    redlaser.sendto(1000, -2100);
+    redlaser.sendto(1200, -2300);
+    redlaser.sendto(1000, -2500);
+    redlaser.sendto(1000, -2300);
+    redlaser.off();
+    redlaser.sendto(1200, -2300);
+    redlaser.on();
+    redlaser.sendto(2000, -2300);
+    redlaser.sendto(2500, -2300);
+    redlaser.off();
+    redlaser.sendto(2000, -2300);
+    redlaser.on();
+    redlaser.sendto(2000, -1000);
+    redlaser.off();
+  }
+}
+
+void displayCurrentMeasured(int numIonsDrifting) {
+  if (displayEnergyLevel == true) {
+    redlaser.off();
+    redlaser.sendto(2000, -2300 + 100 * numIonsDrifting);
+    redlaser.on();
+    redlaser.sendto(2500, -2300 + 100 * numIonsDrifting);
+    redlaser.off();
+  }
 }
 
 #endif
