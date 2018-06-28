@@ -107,7 +107,7 @@ Arduino code to control a DAC that controls the galvo system motors to display t
 
 ### Demo Video
 #### Here is a video moving through the 4 different particle events with two different events for each display.
-![](https://github.com/TurnerWard/Turner_Ward_Personal/blob/master/NEWS-G/NEWSG_DetectorDisplay/NEWSG_DemoVideo_Final.MOV)
+![alt text](https://github.com/TurnerWard/Turner_Ward_Personal/blob/master/NEWS-G/NEWSG_DetectorDisplay/NEWSG_DemoVideo_Final.MOV)
 
 ### NEXT STEPS
 #### -> Determine a way to slow down the particles speed when producing tracks. Adding more points doesnt seem to work due to memory on the arduino but there way be a different better way to acheive this.
