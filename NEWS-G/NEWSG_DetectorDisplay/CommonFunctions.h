@@ -6,7 +6,7 @@
 
 // Variable declaration.
 
-int delayTime = 10; // This changes the delay time as the partcles are moving across the screen. Setting this to 0 results in no delay. A delay of 10 seems reasonable to me.
+int delayTime = 10; // This changes the delay time as the partcles are moving across the screen. Setting this to 0 results in no delay. A delay of 10 (in ms) seems reasonable to me.
 
 Laser redlaser(5); // Initiates a red laser in the 5th arduino pin.
 bool Po210AlphaDone = true, Rn222AlphaDone = true, cosmicrayDone = true, pointlikeparticleDone = true;
