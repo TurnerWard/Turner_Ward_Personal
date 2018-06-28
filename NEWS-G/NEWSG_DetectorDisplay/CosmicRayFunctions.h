@@ -74,7 +74,6 @@ CosmicRay createNewCosmicRay() {
     for (int loc = 0; loc < numberOfParticleSteps; loc++) { // For each step for the particle.
       newCosmicRay.xMovementPath[loc] = pgm_read_word(&(xMPPFQ1Muon[pathNumber][loc])); // Fills the x movement array from PROGMEM.
       newCosmicRay.yMovementPath[loc] = pgm_read_word(&(yMPPFQ1Muon[pathNumber][loc])); // Fills the y movement array from PROGMEM.
-      Serial.println(newCosmicRay.xMovementPath[loc]);
     }
     newCosmicRay.energy = cosmicrayEnergy; // Enters the cosmic rays energy.
     newCosmicRay.movementLocation = arrayStartLocation; // Sets the arrays start location.
@@ -87,7 +86,6 @@ CosmicRay createNewCosmicRay() {
     newCosmicRay.energy = cosmicrayEnergy; // Enters the cosmic rays energy.
     newCosmicRay.movementLocation = arrayStartLocation; // Sets the arrays start location.
   }
-  Serial.println(sizeof(newCosmicRay.xMovementPath)/sizeof(int));
   return newCosmicRay; // Returns this new cosmic ray.
 }
 
@@ -123,7 +121,17 @@ CosmicRay computeNextCosmicRayLocation(CosmicRay cosmicray) {
     for (int loc = 0; loc < numElectronLocationsInArray; loc++) // For every position in the array...
       cosmicElectrons[loc] = computeNextElectronLocation(cosmicElectrons[loc]); // Computes and moves the electon through its current step.
 
-    simulateTrack(energyCurrent, xCurrent, yCurrent); // Updates the cosmic rays position.
+    if (delayTime != 0 ) {
+      int currentTime = millis(); int enteredTime = millis();
+      while (currentTime < enteredTime + delayTime) {
+        currentTime = millis();
+        simulateTrack(energyCurrent, xCurrent, yCurrent); // Updates the cosmic rays position.
+        displayDetector();
+      }
+    }
+    else
+      simulateTrack(energyCurrent, xCurrent, yCurrent); // Updates the cosmic rays position.
+      
     cosmicray.energy = energyCurrent; // Updates the cosmic rays energy.
     cosmicray.movementLocation = cosmicray.movementLocation + 1; // Updates the cosmic rays movement location by increasing it by 1.
     return cosmicray; // Returns this updated cosmic ray.

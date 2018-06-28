@@ -132,10 +132,20 @@ PointLikeParticle computeNextPointLikeParticleLocation(PointLikeParticle pointli
   }
 
   if (pointlikeparticle.movementLocation < numberOfParticleSteps) { // If the cosmic ray can exist.
-    simulateTrack(energyCurrent, xCurrent, yCurrent); // Updates the cosmic rays position.
-    pointlikeparticle.energy = energyCurrent; // Updates the cosmic rays energy.
-    pointlikeparticle.movementLocation = pointlikeparticle.movementLocation + 1; // Updates the cosmic rays movement location by increasing it by 1.
-    return pointlikeparticle; // Returns this new cosmic ray.
+     if (delayTime != 0 ) {
+      int currentTime = millis(); int enteredTime = millis();
+      while (currentTime < enteredTime + delayTime) {
+        currentTime = millis();
+        simulateTrack(energyCurrent, xCurrent, yCurrent); // Updates the point like particles position.
+        displayDetector();
+      }
+    }
+    else
+      simulateTrack(energyCurrent, xCurrent, yCurrent); // Updates the point like particles position.
+      
+    pointlikeparticle.energy = energyCurrent; // Updates the point like particles energy.
+    pointlikeparticle.movementLocation = pointlikeparticle.movementLocation + 1; // Updates the point like particles movement location by increasing it by 1.
+    return pointlikeparticle; // Returns this new point like particle.
   }
   else { // If the cosmic ray has left the detector or has no more energy...
     if (checkPointLikeParticleElectronDist() == false) { // If the electrons or ions are still within the detector.

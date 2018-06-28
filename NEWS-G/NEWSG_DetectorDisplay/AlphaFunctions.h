@@ -219,7 +219,17 @@ Alpha computeNextPo210AlphaLocation(Alpha Po210Alpha) {
     for (int loc = 0; loc < numElectronLocationsInArray; loc++)  // For every position in the array...
       Po210AlphaElectrons[loc] = computeNextElectronLocation(Po210AlphaElectrons[loc]); // Computes and moves the electon through its current step.
 
-    simulateTrack(energyCurrent, xCurrent, yCurrent); // Displays the alphas position.
+     if (delayTime != 0 ) {
+      int currentTime = millis(); int enteredTime = millis();
+      while (currentTime < enteredTime + delayTime) {
+        currentTime = millis();
+        simulateTrack(energyCurrent, xCurrent, yCurrent); // Updates the Po 210 alphas position.
+        displayDetector();
+      }
+    }
+    else
+      simulateTrack(energyCurrent, xCurrent, yCurrent); // Updates the Po 210 alphas position.
+      
     Po210Alpha.energy = energyCurrent; // Updates the alphas energy.
     Po210Alpha.movementLocation = Po210Alpha.movementLocation + 1; // Increases the alphas movemement location by 1 as we are now at the next location.
     return Po210Alpha; // Returns this new Po 210 alpha.
@@ -265,7 +275,17 @@ Alpha computeNextRn222AlphaLocation(Alpha Rn222Alpha) {
     for (int loc = 0; loc < numElectronLocationsInArray; loc++)  // For every position in the array...
       Rn222AlphaElectrons[loc] = computeNextElectronLocation(Rn222AlphaElectrons[loc]); // Computes and moves the electon through its current step.
 
-    simulateTrack(energyCurrent, xCurrent, yCurrent); // Displays the Rn 222 alphas position.
+    if (delayTime != 0 ) {
+      int currentTime = millis(); int enteredTime = millis();
+      while (currentTime < enteredTime + delayTime) {
+        currentTime = millis();
+        simulateTrack(energyCurrent, xCurrent, yCurrent); // Updates the Rn 222 position.
+        displayDetector();
+      }
+    }
+    else
+      simulateTrack(energyCurrent, xCurrent, yCurrent); // Updates the Rn 222 position.
+      
     Rn222Alpha.energy = energyCurrent; // Updates the energy of the Rn 222 alpha.
     Rn222Alpha.movementLocation = Rn222Alpha.movementLocation + 1; // Increases the alphas movemement location by 1 as we are now at the next location.
     return Rn222Alpha; // Returns this new alpha.
