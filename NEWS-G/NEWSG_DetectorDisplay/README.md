@@ -101,6 +101,11 @@ Arduino code to control a DAC that controls the galvo system motors to display t
 |PointLikeParticle createNewPointLikeParticle() | Creates a new point like particle based on the movement and energy libraries. |
 |PointLikeParticle computeNextPointLikeParticleLocation(PointLikeParticle pointlikeparticle) | Moves the point like particle to the next location in its movement array while creating electrons, reducing its energy, and drifting the already generated electrons and eventually ions. This function is in charge of facilitating the point like particles electron and ion drift until the ions leave the detector.	|
 
+### Particle Track Cheat Sheet
+#### The following image contains the track number particle display for each particle in the first quadrant. If looking to make changes to one of these tracks please refer to this picture.
+![alt text](https://github.com/TurnerWard/Turner_Ward_Personal/blob/master/NEWS-G/NEWSG_DetectorDisplay/NumberedParticleTrack.PNG)
+
+
 ### NEXT STEPS
 #### -> Add in multiple laser colours (the difficult part here would be determining how to have the lasers at the same angle. Need a semi-transparent mirror.)
 #### -> Creating a more finalized control panel by getting or creating a button console location.
